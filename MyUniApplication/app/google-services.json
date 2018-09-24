@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "82043516113",
+    "firebase_url": "https://myuni-aade3.firebaseio.com",
+    "project_id": "myuni-aade3",
+    "storage_bucket": "myuni-aade3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:82043516113:android:12fe6388a3ca7b0f",
+        "android_client_info": {
+          "package_name": "com.alonso.myuniapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "82043516113-qupghk6vnuckk9vidhpoorac7gj1tnk4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6Ffh0ju51ix_6nkSKrNaRcpIY_3jXqrw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
