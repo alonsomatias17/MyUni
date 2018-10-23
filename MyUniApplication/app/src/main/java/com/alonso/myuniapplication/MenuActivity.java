@@ -44,6 +44,12 @@ public class MenuActivity extends AppCompatActivity {
                     case R.id.nav_chat:
                         Toast.makeText(MenuActivity.this, "Chat",Toast.LENGTH_SHORT).show();
                         break;
+                    case R.id.nav_aproveed_subjects:
+                        Toast.makeText(MenuActivity.this, "Info",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_ongoing_subjects:
+                        Toast.makeText(MenuActivity.this, "Info",Toast.LENGTH_SHORT).show();
+                        break;
                     case R.id.nav_information:
                         Toast.makeText(MenuActivity.this, "Info",Toast.LENGTH_SHORT).show();
                         break;
