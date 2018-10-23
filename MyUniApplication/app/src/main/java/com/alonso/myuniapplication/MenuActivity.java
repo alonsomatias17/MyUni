@@ -1,19 +1,21 @@
 package com.alonso.myuniapplication;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-public class MenuActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MenuActivity extends AppCompatActivity {
 
     private DrawerLayout menuDrawerLayout;
     private ActionBarDrawerToggle menuActionBarDrawerToggle;
+
+    private NavigationView navigationView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,9 +30,31 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        /*FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.flMain, new MainMenuFragment());
-        fragmentTransaction.commit();*/
+
+        navigationView = (NavigationView)findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                switch(id)
+                {
+                    case R.id.nav_account:
+                        Toast.makeText(MenuActivity.this, "My Account",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_chat:
+                        Toast.makeText(MenuActivity.this, "Chat",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_information:
+                        Toast.makeText(MenuActivity.this, "Info",Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        return false;
+                }
+                return true;
+
+
+            }
+        });
     }
 
     @Override
@@ -41,26 +65,5 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.nav_account:
-                this.startActivity(new Intent(this, ProfileActivity.class));
-                break;
-            case R.id.nav_asignaturas_aprobadas:
-                // another startActivity, this is for item with id "menu_item2"
-                break;
-            case R.id.nav_asignaturas_curso:
-                // another startActivity, this is for item with id "menu_item2"
-                break;
-            case R.id.nav_info:
-                // another startActivity, this is for item with id "menu_item2"
-                break;
-            default:
-                return super.onContextItemSelected(item);
-        }
 
-        return true;
-    }
 }
