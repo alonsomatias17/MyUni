@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "82043516113-pgasm62de731t3em0edilh3kdtnt9jct.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alonso.myuniapplication",
+            "certificate_hash": "5ce4a392e104284a9e375558a1de175ea81514e7"
+          }
+        },
+        {
           "client_id": "82043516113-qupghk6vnuckk9vidhpoorac7gj1tnk4.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "82043516113-qupghk6vnuckk9vidhpoorac7gj1tnk4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2

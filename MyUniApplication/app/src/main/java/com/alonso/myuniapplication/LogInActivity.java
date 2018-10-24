@@ -29,7 +29,7 @@ public class LogInActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-        validateCurrentUser();
+        //validateCurrentUser();
 
         email = (EditText)findViewById(R.id.emailET);
         password = (EditText)findViewById(R.id.passwordET);
@@ -59,7 +59,7 @@ public class LogInActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
                     Toast.makeText(LogInActivity.this,"Credenciales correctas!!!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(LogInActivity.this, MainActivity.class));
+                    startActivity(new Intent(LogInActivity.this, MenuActivity.class));
 
                 } else{
                     Toast.makeText(LogInActivity.this,"Credenciales INCORRECTAS", Toast.LENGTH_SHORT).show();

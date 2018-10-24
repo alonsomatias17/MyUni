@@ -1,5 +1,6 @@
 package com.alonso.myuniapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -9,12 +10,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class MenuActivity extends AppCompatActivity {
 
     private DrawerLayout menuDrawerLayout;
     private ActionBarDrawerToggle menuActionBarDrawerToggle;
 
     private NavigationView navigationView;
+    private FirebaseAuth firebaseAuth;
+
 
 
     @Override
@@ -32,6 +38,13 @@ public class MenuActivity extends AppCompatActivity {
 
 
         navigationView = (NavigationView)findViewById(R.id.nav_view);
+        setNavigationLisatener();
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+    }
+
+    private void setNavigationLisatener() {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {

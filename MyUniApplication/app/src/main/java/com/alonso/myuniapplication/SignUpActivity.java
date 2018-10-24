@@ -8,10 +8,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.alonso.myuniapplication.business.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -21,6 +24,8 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText emailET;
 
     private FirebaseAuth firebaseAuth;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference databaseReferenceUsers;
 
     public static final int USERNAME_MIN_LENGTH = 1;
     public static final int PASSWORD_MIN_LENGTH = 1;
@@ -31,6 +36,7 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        databaseReferenceUsers = FirebaseDatabase.getInstance().getReference("user");
 
         setUpViews();
     }
@@ -49,19 +55,23 @@ public class SignUpActivity extends AppCompatActivity {
         String email = emailET.getText().toString();
 
         if(this.validateCredentialsFmt(userName, password, confirmationPassword, email)){
-            saveUser(password, email);
+            saveUser(userName, password, email);
         } else {
             Toast.makeText(this,"Credenciales Inválidas, vuelva a intentarlo", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void saveUser(String password, String email) {
+    private void saveUser(String userName, String password, final String email) {
+        final String uName = userName;
+
         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()){
                     Toast.makeText(SignUpActivity.this,"Registro de usuario exitoso!!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(SignUpActivity.this, LogInActivity.class));
+                    User user = new User(uName, email);
+                    databaseReferenceUsers.child("user").setValue(user);
+                    startActivity(new Intent(SignUpActivity.this, MenuActivity.class));
                 } else {
                     Toast.makeText(SignUpActivity.this,"Problema al registrar nuevo usuario", Toast.LENGTH_SHORT).show();
                 }
@@ -102,8 +112,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private boolean validUserName(String userName) {
-        //TODO check in DB for not duplicated user name
-        return true;
+        return !userName.equals("");
     }
 
     private boolean validCredentialsLength(String userName, String password) {
