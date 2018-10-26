@@ -53,6 +53,7 @@ public class MenuActivity extends AppCompatActivity {
                 {
                     case R.id.nav_account:
                         Toast.makeText(MenuActivity.this, "My Account",Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(MenuActivity.this, Profile3Activity.class));
                         break;
                     case R.id.nav_chat:
                         Toast.makeText(MenuActivity.this, "Chat",Toast.LENGTH_SHORT).show();

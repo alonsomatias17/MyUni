@@ -1,12 +1,10 @@
 package com.alonso.myuniapplication;
 
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alonso.myuniapplication.business.Career;
 import com.alonso.myuniapplication.business.Subject;
@@ -18,22 +16,24 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public class ProfileActivity extends AppCompatActivity {
+public class Profile3Activity extends AppCompatActivity {
 
-    private TextView userNameET;
-    private TextView emailET;
+    private TextView userNameTV;
+    private TextView emailTV;
     private TextView universityTV;
     private TextView careerTV;
 
-    private EditText careerET;
+    private TextView careerDscTV;
     private EditText universityET;
+
+    private User user;
 
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReferenceUsers;
@@ -49,24 +49,72 @@ public class ProfileActivity extends AppCompatActivity {
         databaseReferenceUsers = FirebaseDatabase.getInstance().getReference("user");
 
 
-        userNameET = findViewById(R.id.userNameTV);
-        emailET = findViewById(R.id.emailTV);
-        universityTV = findViewById(R.id.univercityTV);
-        careerTV = findViewById(R.id.careerTV);
-
-        careerET = findViewById(R.id.confirmationPasswordET);
-        universityET = findViewById(R.id.universityET);
+//        userNameTV = (TextView)findViewById(R.id.userNameTV);
+//        emailTV = findViewById(R.id.emailTV);
+//        universityTV = findViewById(R.id.univercityTV);
+//        careerTV = findViewById(R.id.careerTV);
+//
+//        careerET = findViewById(R.id.confirmationPasswordET);
+//        universityET = findViewById(R.id.universityET);
 
         University university = getMockedUniversitiesAndSave();
-        User user = getUser();
+        findUserByEmail();
+//        User user = getUser();
 //        University university = searchUnivercityByCareer(user.getCareer());
 
-        userNameET.setText(user.getUserName());
-        emailET.setText(user.getEmail());
+//        userNameTV.setText("hola");
+      /*  emailTV.setText(user.getEmail());
         universityTV.setText(university.getName());
         universityET.setText(university.getDescription());
         careerTV.setText(user.getCareer().getName());
-        careerET.setText(user.getCareer().getDescription());
+        careerET.setText(user.getCareer().getDescription());*/
+
+    }
+
+    private void findUserByEmail(){
+        final FirebaseUser firebaseUser = getCurrentUser();
+        Query query = databaseReferenceUsers.orderByChild("email").equalTo(firebaseUser.getEmail());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> snapshotIterator = dataSnapshot.getChildren();
+                Iterator<DataSnapshot> iterator = snapshotIterator.iterator();
+                /*while (iterator.hasNext()) {
+                    DataSnapshot next = (DataSnapshot) iterator.next();
+                    String match = (String) next.child("description").getValue();
+                    String key = next.getKey();
+                    listKeys.add(key);
+                    adapter.add(match);
+                }*/
+                if(iterator.hasNext()){
+                    DataSnapshot next = (DataSnapshot) iterator.next();
+                    user = next.getValue(User.class);
+
+//                    userNameTV = findViewById(R.id.userNameTV);
+//                    emailTV = findViewById(R.id.emailTV);
+//                    universityTV = findViewById(R.id.univercityTV);
+//                    careerTV = findViewById(R.id.careerTV);
+                    careerDscTV = findViewById(R.id.careerDscTV);
+//                    universityET = findViewById(R.id.universityET);
+
+//                    userNameTV.setText(user.getUserName());
+//                    emailTV.setText(user.getEmail());
+//                    universityTV.setText(university.getName());
+//                    universityET.setText(user.getUserName());
+//                    careerTV.setText(user.getCareer().getName());
+                    careerDscTV.setText("Hola");
+
+                } else {
+                    System.out.print("No hay data");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
     }
 
@@ -95,17 +143,24 @@ public class ProfileActivity extends AppCompatActivity {
 
     private User getUser(){
 
-        FirebaseUser user = getCurrentUser();
+        final FirebaseUser user = getCurrentUser();
         users = new ArrayList<>();
         databaseReferenceUsers.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                User user;
+                User userUni;
                 for(DataSnapshot ds: dataSnapshot.getChildren()){
-                    user = ds.getValue(User.class);
-                    users.add(ds.getValue(User.class));
-                    System.out.println(user);
+                    userUni = ds.getValue(User.class);
+                    users.add(userUni);
+                    System.out.println(userUni);
+                    userNameTV = findViewById(R.id.userNameTV);
+
+                    userNameTV.setText(userUni.getUserName());
+/*                    emailTV.setText(userUni.getEmail());
+                    careerTV.setText(userUni.getCareer().getName());
+                    careerET.setText(userUni.getCareer().getDescription());*/
                 }
+
             }
 
             @Override
@@ -114,7 +169,8 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        return users.get(0);
+        System.out.print(users.toString());
+        return new User();
     }
 
     private FirebaseUser getCurrentUser() {
