@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "82043516113-5ftiij0lj7tc284qqfpj2ge4njgcbgil.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alonso.myuniapplication",
+            "certificate_hash": "eee363dee82f71c362d41f3c650a83b753f1f34f"
+          }
+        },
+        {
           "client_id": "82043516113-qupghk6vnuckk9vidhpoorac7gj1tnk4.apps.googleusercontent.com",
           "client_type": 3
         }

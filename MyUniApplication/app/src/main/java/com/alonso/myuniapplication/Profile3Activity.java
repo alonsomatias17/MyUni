@@ -3,6 +3,7 @@ package com.alonso.myuniapplication;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -10,6 +11,8 @@ import com.alonso.myuniapplication.business.Career;
 import com.alonso.myuniapplication.business.Subject;
 import com.alonso.myuniapplication.business.University;
 import com.alonso.myuniapplication.business.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -18,6 +21,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,23 +36,27 @@ public class Profile3Activity extends AppCompatActivity {
     private TextView universityTV;
     private TextView careerTV;
 
-    private TextView careerDscTV;
+    private EditText careerDscET;
     private EditText universityET;
 
     private User user;
 
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReferenceUsers;
+    private FirebaseFirestore firebaseFirestore;
+
 
     List<User> users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        setContentView(R.layout.activity_profile3);
 
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReferenceUsers = FirebaseDatabase.getInstance().getReference("user");
+        firebaseFirestore = FirebaseFirestore.getInstance();
+
 
 
 //        userNameTV = (TextView)findViewById(R.id.userNameTV);
@@ -58,7 +68,7 @@ public class Profile3Activity extends AppCompatActivity {
 //        universityET = findViewById(R.id.universityET);
 
         University university = getMockedUniversitiesAndSave();
-        findUserByEmail();
+        findUserByEmailFS();
 //        User user = getUser();
 //        University university = searchUnivercityByCareer(user.getCareer());
 
@@ -94,7 +104,7 @@ public class Profile3Activity extends AppCompatActivity {
 //                    emailTV = findViewById(R.id.emailTV);
 //                    universityTV = findViewById(R.id.univercityTV);
 //                    careerTV = findViewById(R.id.careerTV);
-                    careerDscTV = findViewById(R.id.careerDscTV);
+//                    careerDscTV = findViewById(R.id.careerDscTV);
 //                    universityET = findViewById(R.id.universityET);
 
 //                    userNameTV.setText(user.getUserName());
@@ -102,7 +112,7 @@ public class Profile3Activity extends AppCompatActivity {
 //                    universityTV.setText(university.getName());
 //                    universityET.setText(user.getUserName());
 //                    careerTV.setText(user.getCareer().getName());
-                    careerDscTV.setText("Hola");
+//                    careerDscTV.setText("Hola");
 
                 } else {
                     System.out.print("No hay data");
@@ -116,6 +126,36 @@ public class Profile3Activity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void findUserByEmailFS(){
+        firebaseFirestore.collection("users")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                User user = document.toObject(User.class);
+                                if(!user.getEmail().equals("")){
+                                    userNameTV = findViewById(R.id.userNameTVProfile);
+                                    emailTV = findViewById(R.id.emailTVProfile);
+                                    careerTV = findViewById(R.id.careerTVProfile);
+                                    careerDscET = findViewById(R.id.careerDscETProfile);
+
+                                    userNameTV.setText(user.getUserName());
+                                    emailTV.setText(user.getEmail());
+                                    careerTV.setText(user.getCareer().getName());
+                                    careerDscET.setText(user.getCareer().getDescription());
+                                }
+
+                                Log.d("findUserByEmailFS", document.getId() + " => " + document.getData());
+                            }
+                        } else {
+                            Log.w("findUserByEmailFS", "Error getting documents.", task.getException());
+                        }
+                    }
+                });
     }
 
     @NonNull
@@ -153,7 +193,7 @@ public class Profile3Activity extends AppCompatActivity {
                     userUni = ds.getValue(User.class);
                     users.add(userUni);
                     System.out.println(userUni);
-                    userNameTV = findViewById(R.id.userNameTV);
+                    userNameTV = findViewById(R.id.userNameTVProfile);
 
                     userNameTV.setText(userUni.getUserName());
 /*                    emailTV.setText(userUni.getEmail());

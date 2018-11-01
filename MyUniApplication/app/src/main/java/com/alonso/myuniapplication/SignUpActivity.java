@@ -16,6 +16,8 @@ import com.alonso.myuniapplication.business.Subject;
 import com.alonso.myuniapplication.business.University;
 import com.alonso.myuniapplication.business.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,6 +26,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +48,7 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReferenceUsers;
     private DatabaseReference databaseReferenceUniversity;
+    private FirebaseFirestore firebaseFirestore;
 
     public static final int USERNAME_MIN_LENGTH = 1;
     public static final int PASSWORD_MIN_LENGTH = 1;
@@ -56,6 +61,7 @@ public class SignUpActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReferenceUsers = FirebaseDatabase.getInstance().getReference("user");
         databaseReferenceUniversity = FirebaseDatabase.getInstance().getReference("university");
+        firebaseFirestore = FirebaseFirestore.getInstance();
 
         setUpViews();
     }
@@ -176,12 +182,30 @@ public class SignUpActivity extends AppCompatActivity {
                 if (task.isSuccessful()){
                     Toast.makeText(SignUpActivity.this,"Registro de usuario exitoso!!", Toast.LENGTH_SHORT).show();
                     User user = new User(userName, email, career);
-                    String id = databaseReferenceUsers.push().getKey();
-                    databaseReferenceUsers.child(id).setValue(user);
+                    /*String id = databaseReferenceUsers.push().getKey();
+                    databaseReferenceUsers.child(id).setValue(user);*/
+                    this.saveUserFS(user);
                     startActivity(new Intent(SignUpActivity.this, MenuActivity.class));
                 } else {
                     Toast.makeText(SignUpActivity.this,"Problema al registrar nuevo usuario", Toast.LENGTH_SHORT).show();
                 }
+            }
+
+            private void saveUserFS(User user) {
+                firebaseFirestore.collection("users")
+                        .add(user)
+                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            @Override
+                            public void onSuccess(DocumentReference documentReference) {
+                                Log.d("saveUserFS", "DocumentSnapshot added with ID: " + documentReference.getId());
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w("saveUserFS", "Error adding document", e);
+                            }
+                        });
             }
         });
     }
