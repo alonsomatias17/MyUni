@@ -39,7 +39,9 @@ public class Profile3Activity extends AppCompatActivity {
     private EditText careerDscET;
     private EditText universityET;
 
+    private University university;
     private User user;
+    FirebaseUser firebaseUser;
 
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReferenceUsers;
@@ -56,7 +58,7 @@ public class Profile3Activity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReferenceUsers = FirebaseDatabase.getInstance().getReference("user");
         firebaseFirestore = FirebaseFirestore.getInstance();
-
+        firebaseUser = getCurrentUser();
 
 
 //        userNameTV = (TextView)findViewById(R.id.userNameTV);
@@ -67,8 +69,9 @@ public class Profile3Activity extends AppCompatActivity {
 //        careerET = findViewById(R.id.confirmationPasswordET);
 //        universityET = findViewById(R.id.universityET);
 
-        University university = getMockedUniversitiesAndSave();
+//        University university = getMockedUniversitiesAndSave();
         findUserByEmailFS();
+        getUniversityFS();
 //        User user = getUser();
 //        University university = searchUnivercityByCareer(user.getCareer());
 
@@ -81,7 +84,7 @@ public class Profile3Activity extends AppCompatActivity {
 
     }
 
-    private void findUserByEmail(){
+    /*private void findUserByEmail(){
         final FirebaseUser firebaseUser = getCurrentUser();
         Query query = databaseReferenceUsers.orderByChild("email").equalTo(firebaseUser.getEmail());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -89,13 +92,13 @@ public class Profile3Activity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> snapshotIterator = dataSnapshot.getChildren();
                 Iterator<DataSnapshot> iterator = snapshotIterator.iterator();
-                /*while (iterator.hasNext()) {
+                *//*while (iterator.hasNext()) {
                     DataSnapshot next = (DataSnapshot) iterator.next();
                     String match = (String) next.child("description").getValue();
                     String key = next.getKey();
                     listKeys.add(key);
                     adapter.add(match);
-                }*/
+                }*//*
                 if(iterator.hasNext()){
                     DataSnapshot next = (DataSnapshot) iterator.next();
                     user = next.getValue(User.class);
@@ -126,17 +129,18 @@ public class Profile3Activity extends AppCompatActivity {
         });
 
 
-    }
+    }*/
 
     private void findUserByEmailFS(){
         firebaseFirestore.collection("users")
+                .whereEqualTo("email", firebaseUser.getEmail())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                User user = document.toObject(User.class);
+                                user = document.toObject(User.class);
                                 if(!user.getEmail().equals("")){
                                     userNameTV = findViewById(R.id.userNameTVProfile);
                                     emailTV = findViewById(R.id.emailTVProfile);
@@ -147,6 +151,33 @@ public class Profile3Activity extends AppCompatActivity {
                                     emailTV.setText(user.getEmail());
                                     careerTV.setText(user.getCareer().getName());
                                     careerDscET.setText(user.getCareer().getDescription());
+                                }
+
+                                Log.d("findUserByEmailFS", document.getId() + " => " + document.getData());
+                            }
+                        } else {
+                            Log.w("findUserByEmailFS", "Error getting documents.", task.getException());
+                        }
+                    }
+                });
+    }
+
+    private void getUniversityFS(){
+        firebaseFirestore.collection("universities")
+                .whereEqualTo("name", "UM")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                university = document.toObject(University.class);
+                                if(!university.getName().equals("")){
+                                    universityTV = findViewById(R.id.universityTVProfile);
+                                    universityET = findViewById(R.id.universityDscETProfile);
+
+                                    universityTV.setText(university.getName());
+                                    universityET.setText(university.getDescription());
                                 }
 
                                 Log.d("findUserByEmailFS", document.getId() + " => " + document.getData());

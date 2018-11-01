@@ -126,9 +126,9 @@ public class SignUpActivity extends AppCompatActivity {
     @NonNull
     private List<University> getMockedUniversitiesAndSave() {
         List<University> universities = new ArrayList<University>();
-        University university = new University(1,"UM", "Morón");
+        University university = new University(1,"UM", this.universityDsc());
 
-        university.getCareers().add(new Career(10, "Ing. Informática", "Morón"));
+        university.getCareers().add(new Career(10, "Ing. Informática", this.careerDsc()));
         university.getCareers().add(new Career(20, "Contador Público", "San Justo"));
         university.getCareers().add(new Career(30, "Profesorado de Educación Física", "CABA"));
 
@@ -150,7 +150,17 @@ public class SignUpActivity extends AppCompatActivity {
         universities.add(university);
 
         //saveUniversity(university);
+
+        saveUniversityFS(university);
         return universities;
+    }
+
+    private String universityDsc() {
+        return "La Universidad de Morón, fundada en 1960, es una institución educativa de gestión privada ubicada en Morón, Buenos Aires, Argentina. Es uno de los centros de estudios universitarios privado más importantes del Gran Buenos Aires";
+    }
+
+    private String careerDsc() {
+        return "La Ingeniería en Sistemas de Información se ocupan del diseño (desarrollo creativo de una idea), implementación (idea que se materializa), organización y control de la información requerida por organismos públicos y privados.";
     }
 
     private void saveUniversity(University university) {
@@ -208,6 +218,23 @@ public class SignUpActivity extends AppCompatActivity {
                         });
             }
         });
+    }
+
+    private void saveUniversityFS(University university) {
+        firebaseFirestore.collection("universities")
+                .add(university)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d("saveUniversityFS", "DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("saveUniversityFS", "Error adding document", e);
+                    }
+                });
     }
 
     private boolean validateCredentialsFmt(String userName, String password, String confirmationPassword, String email) {
