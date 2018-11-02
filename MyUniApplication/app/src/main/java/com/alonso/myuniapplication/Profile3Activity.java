@@ -35,6 +35,8 @@ public class Profile3Activity extends AppCompatActivity {
     private TextView emailTV;
     private TextView universityTV;
     private TextView careerTV;
+    private TextView universityDscTV;
+    private TextView careerDscTV;
 
     private EditText careerDscET;
     private EditText universityET;
@@ -145,12 +147,16 @@ public class Profile3Activity extends AppCompatActivity {
                                     userNameTV = findViewById(R.id.userNameTVProfile);
                                     emailTV = findViewById(R.id.emailTVProfile);
                                     careerTV = findViewById(R.id.careerTVProfile);
-                                    careerDscET = findViewById(R.id.careerDscETProfile);
+//                                    careerDscET = findViewById(R.id.careerDscETProfile);
+                                    careerDscTV = findViewById(R.id.careerDscProfileTV);
+
 
                                     userNameTV.setText(user.getUserName());
                                     emailTV.setText(user.getEmail());
                                     careerTV.setText(user.getCareer().getName());
-                                    careerDscET.setText(user.getCareer().getDescription());
+//                                    careerDscET.setText(user.getCareer().getDescription());
+                                    careerDscTV.setText(user.getCareer().getDescription());
+
                                 }
 
                                 Log.d("findUserByEmailFS", document.getId() + " => " + document.getData());
@@ -164,7 +170,7 @@ public class Profile3Activity extends AppCompatActivity {
 
     private void getUniversityFS(){
         firebaseFirestore.collection("universities")
-                .whereEqualTo("name", "UM")
+                .whereEqualTo("name", "Universidad de Morón")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -174,10 +180,10 @@ public class Profile3Activity extends AppCompatActivity {
                                 university = document.toObject(University.class);
                                 if(!university.getName().equals("")){
                                     universityTV = findViewById(R.id.universityTVProfile);
-                                    universityET = findViewById(R.id.universityDscETProfile);
+                                    universityDscTV = findViewById(R.id.universityDscProfileTV);
 
                                     universityTV.setText(university.getName());
-                                    universityET.setText(university.getDescription());
+                                    universityDscTV.setText(university.getDescription());
                                 }
 
                                 Log.d("findUserByEmailFS", document.getId() + " => " + document.getData());
