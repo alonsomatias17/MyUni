@@ -78,7 +78,7 @@ public class Profile3Activity extends AppCompatActivity {
 //        Bundle bundle = getIntent().getExtras();
 //        userDTO = bundle.getParcelable("User");
 //
-        userDTO = mIntent.getParcelableExtra("User");
+        user = mIntent.getParcelableExtra("User");
         System.out.println("Profile3Activity. User info: " + user.getUserName() + " " + user.getEmail());
 
         findUserByEmailFS();

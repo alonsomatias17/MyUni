@@ -69,9 +69,9 @@ public class MenuActivity extends AppCompatActivity {
 //                        startActivity(new Intent(MenuActivity.this, Profile3Activity.class));
 
                         Intent mIntent = new Intent(MenuActivity.this, Profile3Activity.class);
-                        System.out.println("MenuActivity. User info: " + user.getUserName() + " " + user.getEmail());
+//                        System.out.println("MenuActivity. User info: " + user.getUserName() + " " + user.getEmail());
 
-                        mIntent.putExtra("User", userDTO);
+                        mIntent.putExtra("User", user);
                         startActivity(mIntent);
                         break;
                     case R.id.nav_chat:
@@ -107,7 +107,7 @@ public class MenuActivity extends AppCompatActivity {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 user = document.toObject(User.class);
                                 if(!user.getEmail().equals("")){
-                                    userDTO = new UserDTO(user.getUserName(), user.getEmail());
+//                                    userDTO = new UserDTO(user.getUserName(), user.getEmail());
 //                                    progressBarStatus++;
                                 }
 

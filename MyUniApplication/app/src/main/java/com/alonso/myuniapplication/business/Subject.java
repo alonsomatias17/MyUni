@@ -1,6 +1,9 @@
 package com.alonso.myuniapplication.business;
 
-public class Subject {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Subject implements Parcelable {
 
     private int code;
     private String name;
@@ -22,6 +25,26 @@ public class Subject {
         this.year = year;
         this.state = NOT_APPROVED;
     }
+
+    protected Subject(Parcel in) {
+        code = in.readInt();
+        name = in.readString();
+        description = in.readString();
+        state = in.readString();
+        year = in.readInt();
+    }
+
+    public static final Creator<Subject> CREATOR = new Creator<Subject>() {
+        @Override
+        public Subject createFromParcel(Parcel in) {
+            return new Subject(in);
+        }
+
+        @Override
+        public Subject[] newArray(int size) {
+            return new Subject[size];
+        }
+    };
 
     public int getCode() {
         return code;
@@ -61,5 +84,19 @@ public class Subject {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(code);
+        parcel.writeString(name);
+        parcel.writeString(description);
+        parcel.writeString(state);
+        parcel.writeInt(year);
     }
 }
