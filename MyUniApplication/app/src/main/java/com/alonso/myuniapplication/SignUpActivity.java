@@ -28,6 +28,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +44,7 @@ public class SignUpActivity extends AppCompatActivity {
     private Spinner careerSP;
 
     List<User> users;
-    List<University> universities;
+    List<University> universities = new ArrayList<>();
     University university;
 
     private FirebaseAuth firebaseAuth;
@@ -67,51 +69,29 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void setUpViews() {
-        /*users = new ArrayList<>();
-        databaseReferenceUsers.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                User user;
-                for(DataSnapshot ds: dataSnapshot.getChildren()){
-                    user = ds.getValue(User.class);
-                    users.add(ds.getValue(User.class));
-                    System.out.println(user);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });*/
 
         userNameET = (EditText)findViewById(R.id.userNameET2);
         passwordET = (EditText)findViewById(R.id.passwordET2);
         confirmationPasswordET = (EditText)findViewById(R.id.confirmationPasswordET);
         emailET = (EditText)findViewById(R.id.emailET);
 
-        universities = getMockedUniversitiesAndSave();
-        databaseReferenceUniversity.addValueEventListener(new ValueEventListener() {
+//        universities = getMockedUniversitiesAndSave();
+        getUniversityFS();
+        /*databaseReferenceUniversity.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 universities = new ArrayList<>();
                 university = dataSnapshot.getValue(University.class);
-                /*for(DataSnapshot ds: dataSnapshot.getChildren()){
-                    university = ds.getValue(University.class);
-                    universities.add(university);
-//                    System.out.println(universities.get(0).toString());
-                }*/
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.w("Firebase", "loadPost:onCancelled", databaseError.toException());
-//                System.out.println("The read failed: " + databaseError.getCode());
             }
-        });
+        });*/
 
 
-        careerSP = (Spinner) findViewById(R.id.careerSP);
+        /*careerSP = (Spinner) findViewById(R.id.careerSP);
         ArrayAdapter<Career> dataAdapter1 = new ArrayAdapter<Career>(this, android.R.layout.simple_spinner_item, universities.get(0).getCareers());
         dataAdapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         careerSP.setAdapter(dataAdapter1);
@@ -119,14 +99,55 @@ public class SignUpActivity extends AppCompatActivity {
         universitySP = (Spinner) findViewById(R.id.univercitySP);
         ArrayAdapter<University> dataAdapter = new ArrayAdapter<University>(this, android.R.layout.simple_spinner_item, universities);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        universitySP.setAdapter(dataAdapter);
+        universitySP.setAdapter(dataAdapter);*/
 
+    }
+
+    private void getUniversityFS(){
+        firebaseFirestore.collection("universities")
+                .whereEqualTo("name", "Universidad de Morón")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                university = document.toObject(University.class);
+                                if(!university.getName().equals("")){
+
+                                    universities.add(university);
+
+                                    careerSP = (Spinner) findViewById(R.id.careerSP);
+                                    ArrayAdapter<Career> dataAdapter1 = new ArrayAdapter<Career>(SignUpActivity.this, android.R.layout.simple_spinner_item, universities.get(0).getCareers());
+                                    dataAdapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                    careerSP.setAdapter(dataAdapter1);
+
+                                    universitySP = (Spinner) findViewById(R.id.univercitySP);
+                                    ArrayAdapter<University> dataAdapter = new ArrayAdapter<University>(SignUpActivity.this, android.R.layout.simple_spinner_item, universities);
+                                    dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                    universitySP.setAdapter(dataAdapter);
+
+/*                                    universityTV = findViewById(R.id.universityTVProfile);
+                                    universityDscTV = findViewById(R.id.universityDscProfileTV);
+
+                                    universityTV.setText(university.getName());
+                                    universityDscTV.setText(university.getDescription());
+                                    progressBarStatus++;*/
+                                }
+
+                                Log.d("findUserByEmailFS", document.getId() + " => " + document.getData());
+                            }
+                        } else {
+                            Log.w("findUserByEmailFS", "Error getting documents.", task.getException());
+                        }
+                    }
+                });
     }
 
     @NonNull
     private List<University> getMockedUniversitiesAndSave() {
-        List<University> universities = new ArrayList<University>();
-        University university = new University(1,"UM", this.universityDsc());
+        List<University> universities = new ArrayList<>();
+        University university = new University(1,"Universidad de Morón", this.universityDsc());
 
         university.getCareers().add(new Career(10, "Ing. Informática", this.careerDsc()));
         university.getCareers().add(new Career(20, "Contador Público", "San Justo"));
@@ -149,9 +170,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         universities.add(university);
 
-        //saveUniversity(university);
-
-        saveUniversityFS(university);
+//        saveUniversityFS(university);
         return universities;
     }
 
@@ -163,16 +182,12 @@ public class SignUpActivity extends AppCompatActivity {
         return "La Ingeniería en Sistemas de Información se ocupan del diseño (desarrollo creativo de una idea), implementación (idea que se materializa), organización y control de la información requerida por organismos públicos y privados.";
     }
 
-    private void saveUniversity(University university) {
-        String id = databaseReferenceUniversity.push().getKey();
-        databaseReferenceUniversity.child(id).setValue(university);
-    }
-
     public void signUp(View view){
         String userName = userNameET.getText().toString();
         String password = passwordET.getText().toString();
         String confirmationPassword = confirmationPasswordET.getText().toString();
         String email = emailET.getText().toString();
+
         //TODO: filter career in order to fit university
         University university = (University) universitySP.getSelectedItem();
         Career career = (Career) careerSP.getSelectedItem();
@@ -192,8 +207,6 @@ public class SignUpActivity extends AppCompatActivity {
                 if (task.isSuccessful()){
                     Toast.makeText(SignUpActivity.this,"Registro de usuario exitoso!!", Toast.LENGTH_SHORT).show();
                     User user = new User(userName, email, career);
-                    /*String id = databaseReferenceUsers.push().getKey();
-                    databaseReferenceUsers.child(id).setValue(user);*/
                     this.saveUserFS(user);
                     startActivity(new Intent(SignUpActivity.this, MenuActivity.class));
                 } else {

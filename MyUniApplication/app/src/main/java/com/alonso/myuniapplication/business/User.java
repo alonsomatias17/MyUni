@@ -9,9 +9,6 @@ public class User {
     private Career career;
     private List<Subject> approvedSubjects;
 
-    public User() {
-    }
-
 
     public User(String userName, String email, Career career) {
         this.userName = userName;

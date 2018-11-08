@@ -1,16 +1,20 @@
 package com.alonso.myuniapplication;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.alonso.myuniapplication.business.Career;
 import com.alonso.myuniapplication.business.Subject;
 import com.alonso.myuniapplication.business.University;
 import com.alonso.myuniapplication.business.User;
+import com.alonso.myuniapplication.business.UserDTO;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,19 +42,17 @@ public class Profile3Activity extends AppCompatActivity {
     private TextView universityDscTV;
     private TextView careerDscTV;
 
-    private EditText careerDscET;
-    private EditText universityET;
-
     private University university;
     private User user;
-    FirebaseUser firebaseUser;
+    private ProgressBar progressBar;
+    private int progressBarStatus = 0;
+    private UserDTO userDTO;
 
+    FirebaseUser firebaseUser;
     private FirebaseAuth firebaseAuth;
-    private DatabaseReference databaseReferenceUsers;
     private FirebaseFirestore firebaseFirestore;
 
-
-    List<User> users;
+    private static final int PBSTATUS_LOAD_FINISHED = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,80 +60,31 @@ public class Profile3Activity extends AppCompatActivity {
         setContentView(R.layout.activity_profile3);
 
         firebaseAuth = FirebaseAuth.getInstance();
-        databaseReferenceUsers = FirebaseDatabase.getInstance().getReference("user");
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseUser = getCurrentUser();
+        progressBar = findViewById(R.id.progressBarProfile);
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (progressBarStatus < PBSTATUS_LOAD_FINISHED) {
+                }
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+        }).start();
 
-//        userNameTV = (TextView)findViewById(R.id.userNameTV);
-//        emailTV = findViewById(R.id.emailTV);
-//        universityTV = findViewById(R.id.univercityTV);
-//        careerTV = findViewById(R.id.careerTV);
+        Intent mIntent = getIntent();
 //
-//        careerET = findViewById(R.id.confirmationPasswordET);
-//        universityET = findViewById(R.id.universityET);
+//        Bundle bundle = getIntent().getExtras();
+//        userDTO = bundle.getParcelable("User");
+//
+        userDTO = mIntent.getParcelableExtra("User");
+        System.out.println("Profile3Activity. User info: " + user.getUserName() + " " + user.getEmail());
 
-//        University university = getMockedUniversitiesAndSave();
         findUserByEmailFS();
         getUniversityFS();
-//        User user = getUser();
-//        University university = searchUnivercityByCareer(user.getCareer());
-
-//        userNameTV.setText("hola");
-      /*  emailTV.setText(user.getEmail());
-        universityTV.setText(university.getName());
-        universityET.setText(university.getDescription());
-        careerTV.setText(user.getCareer().getName());
-        careerET.setText(user.getCareer().getDescription());*/
-
     }
 
-    /*private void findUserByEmail(){
-        final FirebaseUser firebaseUser = getCurrentUser();
-        Query query = databaseReferenceUsers.orderByChild("email").equalTo(firebaseUser.getEmail());
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Iterable<DataSnapshot> snapshotIterator = dataSnapshot.getChildren();
-                Iterator<DataSnapshot> iterator = snapshotIterator.iterator();
-                *//*while (iterator.hasNext()) {
-                    DataSnapshot next = (DataSnapshot) iterator.next();
-                    String match = (String) next.child("description").getValue();
-                    String key = next.getKey();
-                    listKeys.add(key);
-                    adapter.add(match);
-                }*//*
-                if(iterator.hasNext()){
-                    DataSnapshot next = (DataSnapshot) iterator.next();
-                    user = next.getValue(User.class);
-
-//                    userNameTV = findViewById(R.id.userNameTV);
-//                    emailTV = findViewById(R.id.emailTV);
-//                    universityTV = findViewById(R.id.univercityTV);
-//                    careerTV = findViewById(R.id.careerTV);
-//                    careerDscTV = findViewById(R.id.careerDscTV);
-//                    universityET = findViewById(R.id.universityET);
-
-//                    userNameTV.setText(user.getUserName());
-//                    emailTV.setText(user.getEmail());
-//                    universityTV.setText(university.getName());
-//                    universityET.setText(user.getUserName());
-//                    careerTV.setText(user.getCareer().getName());
-//                    careerDscTV.setText("Hola");
-
-                } else {
-                    System.out.print("No hay data");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-
-    }*/
 
     private void findUserByEmailFS(){
         firebaseFirestore.collection("users")
@@ -156,7 +109,7 @@ public class Profile3Activity extends AppCompatActivity {
                                     careerTV.setText(user.getCareer().getName());
 //                                    careerDscET.setText(user.getCareer().getDescription());
                                     careerDscTV.setText(user.getCareer().getDescription());
-
+                                    progressBarStatus++;
                                 }
 
                                 Log.d("findUserByEmailFS", document.getId() + " => " + document.getData());
@@ -184,6 +137,7 @@ public class Profile3Activity extends AppCompatActivity {
 
                                     universityTV.setText(university.getName());
                                     universityDscTV.setText(university.getDescription());
+                                    progressBarStatus++;
                                 }
 
                                 Log.d("findUserByEmailFS", document.getId() + " => " + document.getData());
@@ -216,38 +170,6 @@ public class Profile3Activity extends AppCompatActivity {
 
         //saveUniversity(university);
         return university;
-    }
-
-    private User getUser(){
-
-        final FirebaseUser user = getCurrentUser();
-        users = new ArrayList<>();
-        databaseReferenceUsers.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                User userUni;
-                for(DataSnapshot ds: dataSnapshot.getChildren()){
-                    userUni = ds.getValue(User.class);
-                    users.add(userUni);
-                    System.out.println(userUni);
-                    userNameTV = findViewById(R.id.userNameTVProfile);
-
-                    userNameTV.setText(userUni.getUserName());
-/*                    emailTV.setText(userUni.getEmail());
-                    careerTV.setText(userUni.getCareer().getName());
-                    careerET.setText(userUni.getCareer().getDescription());*/
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });
-
-        System.out.print(users.toString());
-        return new User();
     }
 
     private FirebaseUser getCurrentUser() {

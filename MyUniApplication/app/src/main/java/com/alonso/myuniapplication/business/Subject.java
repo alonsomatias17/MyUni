@@ -5,7 +5,12 @@ public class Subject {
     private int code;
     private String name;
     private String description;
+    private String state;
     private int year;
+
+    private static final String APPROVED = "Aprobada";
+    private static final String ONGOING = "En curso";
+    private static final String NOT_APPROVED = "No aprobada";
 
     public Subject() {
     }
@@ -15,6 +20,7 @@ public class Subject {
         this.name = name;
         this.description = description;
         this.year = year;
+        this.state = NOT_APPROVED;
     }
 
     public int getCode() {
@@ -47,5 +53,13 @@ public class Subject {
 
     public void setYear(int year) {
         this.year = year;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }
