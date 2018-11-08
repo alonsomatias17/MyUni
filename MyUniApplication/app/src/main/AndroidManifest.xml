@@ -37,7 +37,8 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".MenuActivity" />
-        <activity android:name=".Profile3Activity"></activity>
+        <activity android:name=".Profile3Activity" />
+        <activity android:name=".ApprovedSubjectsActivity"></activity>
     </application>
 
 </manifest>

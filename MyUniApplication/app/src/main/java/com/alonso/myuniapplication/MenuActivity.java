@@ -66,19 +66,20 @@ public class MenuActivity extends AppCompatActivity {
                 {
                     case R.id.nav_account:
                         Toast.makeText(MenuActivity.this, "My Account",Toast.LENGTH_SHORT).show();
-//                        startActivity(new Intent(MenuActivity.this, Profile3Activity.class));
 
-                        Intent mIntent = new Intent(MenuActivity.this, Profile3Activity.class);
-//                        System.out.println("MenuActivity. User info: " + user.getUserName() + " " + user.getEmail());
-
-                        mIntent.putExtra("User", user);
-                        startActivity(mIntent);
+                        Intent accountIntent = new Intent(MenuActivity.this, Profile3Activity.class);
+                        accountIntent.putExtra("User", user);
+                        startActivity(accountIntent);
                         break;
                     case R.id.nav_chat:
                         Toast.makeText(MenuActivity.this, "Chat",Toast.LENGTH_SHORT).show();
                         break;
-                    case R.id.nav_aproveed_subjects:
+                    case R.id.nav_asign_aprobadas:
                         Toast.makeText(MenuActivity.this, "Info",Toast.LENGTH_SHORT).show();
+
+                        Intent ASIntent = new Intent(MenuActivity.this, ApprovedSubjectsActivity.class);
+                        ASIntent.putExtra("UserToApSubject", user);
+                        startActivity(ASIntent);
                         break;
                     case R.id.nav_ongoing_subjects:
                         Toast.makeText(MenuActivity.this, "Info",Toast.LENGTH_SHORT).show();
