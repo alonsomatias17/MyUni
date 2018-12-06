@@ -43,16 +43,14 @@ public class Profile3Activity extends AppCompatActivity {
     private TextView careerDscTV;
 
     private University university;
-    private User user;
+    private User user = new User();
     private ProgressBar progressBar;
     private int progressBarStatus = 0;
-    private UserDTO userDTO;
 
-    FirebaseUser firebaseUser;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
 
-    private static final int PBSTATUS_LOAD_FINISHED = 2;
+    private static final int PBSTATUS_LOAD_FINISHED = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,59 +59,36 @@ public class Profile3Activity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
-        firebaseUser = getCurrentUser();
         progressBar = findViewById(R.id.progressBarProfile);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (progressBarStatus < PBSTATUS_LOAD_FINISHED) {
-                }
-                progressBar.setVisibility(View.INVISIBLE);
-            }
-        }).start();
 
         Intent mIntent = getIntent();
         user = mIntent.getParcelableExtra("User");
 
-        findUserByEmailFS();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (progressBarStatus < PBSTATUS_LOAD_FINISHED && user.getUserName().equals("")) {
+                }
+                setUserProfile();
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+        }).start();
+
         getUniversityFS();
     }
 
+    private void setUserProfile() {
+        userNameTV = findViewById(R.id.userNameTVProfile);
+        emailTV = findViewById(R.id.emailTVProfile);
+        careerTV = findViewById(R.id.careerTVProfile);
+        careerDscTV = findViewById(R.id.careerDscProfileTV);
 
-    private void findUserByEmailFS(){
-        firebaseFirestore.collection("users")
-                .whereEqualTo("email", firebaseUser.getEmail())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                user = document.toObject(User.class);
-                                if(!user.getEmail().equals("")){
-                                    userNameTV = findViewById(R.id.userNameTVProfile);
-                                    emailTV = findViewById(R.id.emailTVProfile);
-                                    careerTV = findViewById(R.id.careerTVProfile);
-//                                    careerDscET = findViewById(R.id.careerDscETProfile);
-                                    careerDscTV = findViewById(R.id.careerDscProfileTV);
-
-
-                                    userNameTV.setText(user.getUserName());
-                                    emailTV.setText(user.getEmail());
-                                    careerTV.setText(user.getCareer().getName());
-//                                    careerDscET.setText(user.getCareer().getDescription());
-                                    careerDscTV.setText(user.getCareer().getDescription());
-                                    progressBarStatus++;
-                                }
-
-                                Log.d("findUserByEmailFS", document.getId() + " => " + document.getData());
-                            }
-                        } else {
-                            Log.w("findUserByEmailFS", "Error getting documents.", task.getException());
-                        }
-                    }
-                });
+        userNameTV.setText(user.getUserName());
+        emailTV.setText(user.getEmail());
+        careerTV.setText(user.getCareer().getName());
+        careerDscTV.setText(user.getCareer().getDescription());
+        progressBarStatus++;
     }
 
     private void getUniversityFS(){
@@ -142,32 +117,5 @@ public class Profile3Activity extends AppCompatActivity {
                         }
                     }
                 });
-    }
-
-    @NonNull
-    private University getMockedUniversitiesAndSave() {
-        University university = new University(1,"UM", "Morón");
-
-        university.getCareers().add(new Career(10, "Ing. Informática", "Morón"));
-        university.getCareers().add(new Career(20, "Contador Público", "San Justo"));
-        university.getCareers().add(new Career(30, "Profesorado de Educación Física", "CABA"));
-
-        university.getCareers().get(0).getSubjects().add(new Subject(100, "Análisis I", "Análisis I", 1));
-        university.getCareers().get(0).getSubjects().add(new Subject(200, "Circuitos y Sistemas Digitales", "Circuitos y Sistemas Digitales", 1));
-        university.getCareers().get(0).getSubjects().add(new Subject(300, "Probabilidad y Estadística", "Probabilidad y Estadística", 2));
-        university.getCareers().get(0).getSubjects().add(new Subject(400, "Análisis II", "Análisis II", 2));
-        university.getCareers().get(0).getSubjects().add(new Subject(500, "Aquitecura del Computador", "Aquitecura del Computador", 2));
-        university.getCareers().get(0).getSubjects().add(new Subject(600, "Física I", "Física", 1));
-        university.getCareers().get(0).getSubjects().add(new Subject(700, "Trabajo de Campo", "Trabajo de Campo", 3));
-        university.getCareers().get(0).getSubjects().add(new Subject(800, "Análisis de Sistemas", "Análisis de Sistemas", 2));
-        university.getCareers().get(0).getSubjects().add(new Subject(900, "Diseño de aplicaciones", "Diseño de aplicaciones", 3));
-
-
-        //saveUniversity(university);
-        return university;
-    }
-
-    private FirebaseUser getCurrentUser() {
-        return  firebaseAuth.getCurrentUser();
     }
 }

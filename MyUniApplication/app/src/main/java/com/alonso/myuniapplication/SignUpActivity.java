@@ -43,7 +43,6 @@ public class SignUpActivity extends AppCompatActivity {
     private Spinner universitySP;
     private Spinner careerSP;
 
-    List<User> users;
     List<University> universities = new ArrayList<>();
     University university;
 
@@ -61,46 +60,21 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
 
         firebaseAuth = FirebaseAuth.getInstance();
-        databaseReferenceUsers = FirebaseDatabase.getInstance().getReference("user");
-        databaseReferenceUniversity = FirebaseDatabase.getInstance().getReference("university");
+        //TODO: delete
+//        databaseReferenceUsers = FirebaseDatabase.getInstance().getReference("user");
+//        databaseReferenceUniversity = FirebaseDatabase.getInstance().getReference("university");
         firebaseFirestore = FirebaseFirestore.getInstance();
 
         setUpViews();
     }
 
     private void setUpViews() {
-
         userNameET = (EditText)findViewById(R.id.userNameET2);
         passwordET = (EditText)findViewById(R.id.passwordET2);
         confirmationPasswordET = (EditText)findViewById(R.id.confirmationPasswordET);
         emailET = (EditText)findViewById(R.id.emailET);
 
-//        universities = getMockedUniversitiesAndSave();
         getUniversityFS();
-        /*databaseReferenceUniversity.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                universities = new ArrayList<>();
-                university = dataSnapshot.getValue(University.class);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.w("Firebase", "loadPost:onCancelled", databaseError.toException());
-            }
-        });*/
-
-
-        /*careerSP = (Spinner) findViewById(R.id.careerSP);
-        ArrayAdapter<Career> dataAdapter1 = new ArrayAdapter<Career>(this, android.R.layout.simple_spinner_item, universities.get(0).getCareers());
-        dataAdapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        careerSP.setAdapter(dataAdapter1);
-
-        universitySP = (Spinner) findViewById(R.id.univercitySP);
-        ArrayAdapter<University> dataAdapter = new ArrayAdapter<University>(this, android.R.layout.simple_spinner_item, universities);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        universitySP.setAdapter(dataAdapter);*/
-
     }
 
     private void getUniversityFS(){
@@ -126,15 +100,7 @@ public class SignUpActivity extends AppCompatActivity {
                                     ArrayAdapter<University> dataAdapter = new ArrayAdapter<University>(SignUpActivity.this, android.R.layout.simple_spinner_item, universities);
                                     dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                                     universitySP.setAdapter(dataAdapter);
-
-/*                                    universityTV = findViewById(R.id.universityTVProfile);
-                                    universityDscTV = findViewById(R.id.universityDscProfileTV);
-
-                                    universityTV.setText(university.getName());
-                                    universityDscTV.setText(university.getDescription());
-                                    progressBarStatus++;*/
                                 }
-
                                 Log.d("findUserByEmailFS", document.getId() + " => " + document.getData());
                             }
                         } else {
@@ -207,6 +173,9 @@ public class SignUpActivity extends AppCompatActivity {
                 if (task.isSuccessful()){
                     Toast.makeText(SignUpActivity.this,"Registro de usuario exitoso!!", Toast.LENGTH_SHORT).show();
                     User user = new User(userName, email, career);
+                    user.getApprovedSubjects().add(career.getSubjects().get(0));
+                    user.getApprovedSubjects().add(career.getSubjects().get(1));
+
                     this.saveUserFS(user);
                     startActivity(new Intent(SignUpActivity.this, MenuActivity.class));
                 } else {

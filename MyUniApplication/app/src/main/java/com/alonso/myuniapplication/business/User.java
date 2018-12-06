@@ -21,6 +21,7 @@ public class User implements Parcelable {
         this.userName = userName;
         this.email = email;
         this.career = career;
+        approvedSubjects = new ArrayList<>();
     }
 
     protected User(Parcel in) {

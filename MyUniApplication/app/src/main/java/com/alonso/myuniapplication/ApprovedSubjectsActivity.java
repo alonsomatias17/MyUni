@@ -31,12 +31,17 @@ public class ApprovedSubjectsActivity extends AppCompatActivity {
         Intent mIntent = getIntent();
         user = mIntent.getParcelableExtra("UserToApSubject");
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        List<Subject> mockedSubjets = new ArrayList<>();
+        mockedSubjets.add(user.getCareer().getSubjects().get(0));
+        mockedSubjets.add(user.getCareer().getSubjects().get(1));
 
-        usAdapter = new UserSubjectAdapter(user.getApprovedSubjects());
+//        mockedSubjets.add(new Subject(100, "Análisis I", "Análisis I", 1));
+
+        usAdapter = new UserSubjectAdapter(mockedSubjets);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

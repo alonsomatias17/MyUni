@@ -21,7 +21,6 @@ public class LogInActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,7 +28,7 @@ public class LogInActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-        validateCurrentUser();
+//        validateCurrentUser();
 
         email = (EditText)findViewById(R.id.emailET);
         password = (EditText)findViewById(R.id.passwordET);
