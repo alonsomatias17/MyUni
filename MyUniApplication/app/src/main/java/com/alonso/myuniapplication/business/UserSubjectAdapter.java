@@ -23,7 +23,6 @@ public class UserSubjectAdapter extends RecyclerView.Adapter<UserSubjectAdapter.
         }
     }
 
-
     public UserSubjectAdapter(List<Subject> subjects) {
         this.subjects = subjects;
     }
@@ -31,7 +30,7 @@ public class UserSubjectAdapter extends RecyclerView.Adapter<UserSubjectAdapter.
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.movie_list_row, parent, false);
+                .inflate(R.layout.subjects_list_row, parent, false);
 
         return new MyViewHolder(itemView);
     }
@@ -39,7 +38,8 @@ public class UserSubjectAdapter extends RecyclerView.Adapter<UserSubjectAdapter.
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Subject subject = subjects.get(position);
-        holder.title.setText(subject.getName()  );
+        holder.title.setText(subject.getName());
+
     }
 
     @Override

@@ -11,9 +11,9 @@ public class Subject implements Parcelable {
     private String state;
     private int year;
 
-    private static final String APPROVED = "Aprobada";
-    private static final String ONGOING = "En curso";
-    private static final String NOT_APPROVED = "No aprobada";
+    public static final String APPROVED = "Aprobada";
+    public static final String ONGOING = "En curso";
+    public static final String NOT_APPROVED = "No aprobada";
 
     public Subject() {
     }
@@ -98,5 +98,17 @@ public class Subject implements Parcelable {
         parcel.writeString(description);
         parcel.writeString(state);
         parcel.writeInt(year);
+    }
+
+    public void changeState() {
+        if(this.state.equals(NOT_APPROVED)){
+            this.state = APPROVED;
+            return;
+        }
+        if(this.state.equals(APPROVED)){
+            this.state = NOT_APPROVED;
+            return;
+        }
+
     }
 }
