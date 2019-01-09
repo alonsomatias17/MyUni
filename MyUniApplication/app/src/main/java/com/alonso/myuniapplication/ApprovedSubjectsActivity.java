@@ -3,14 +3,11 @@ package com.alonso.myuniapplication;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Toast;
 
-import com.alonso.myuniapplication.adapters.SingerAdapter;
-import com.alonso.myuniapplication.business.Subject;
+import com.alonso.myuniapplication.adapters.UserAdapter;
 import com.alonso.myuniapplication.business.User;
 import com.alonso.myuniapplication.business.UserSubjectCheckedAdapter;
 
@@ -21,7 +18,7 @@ public class ApprovedSubjectsActivity extends AppCompatActivity {
 //    private UserSubjectAdapter usAdapter;
     private UserSubjectCheckedAdapter usAdapter;
 
-    private SingerAdapter mAdapter;
+    private UserAdapter mAdapter;
 
     String[] singersName = {"Mohammad Rafi", "Lata Mangeshkar", "Sonu Nigam", "Kishore Kumar",
             "Sreya Ghoshal ","Asha Bhosle","Udit Narayan","Alka Yagnik"};
@@ -66,7 +63,7 @@ public class ApprovedSubjectsActivity extends AppCompatActivity {
 
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mAdapter = new SingerAdapter(getApplicationContext(), user.getApprovedSubjects());
+        mAdapter = new UserAdapter(getApplicationContext(), user.getApprovedSubjects());
 
         // vertical RecyclerView
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -78,5 +75,6 @@ public class ApprovedSubjectsActivity extends AppCompatActivity {
         // adding inbuilt divider line
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
     }
 }

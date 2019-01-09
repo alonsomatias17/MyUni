@@ -14,14 +14,13 @@ import com.alonso.myuniapplication.business.Subject;
 import java.util.List;
 
 
-public class SingerAdapter extends RecyclerView.Adapter<SingerAdapter.MyViewHolder> {
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> {
 
-    //    private String[] singersName;
     private List<Subject> subjects;
     Context context;
 
 
-    public SingerAdapter(Context context, List<Subject> subjects) {
+    public UserAdapter(Context context, List<Subject> subjects) {
         this.subjects = subjects;
         this.context = context;
     }
@@ -42,20 +41,31 @@ public class SingerAdapter extends RecyclerView.Adapter<SingerAdapter.MyViewHold
     }
 
     @Override
+    //Itera al setear la lista por cada uno de los elementos
     public void onBindViewHolder(final MyViewHolder holder, int position) {
+        final int pos = position;
         Subject subject = subjects.get(position);
         holder.subjectCheckedTextView.setText(subject.getName());
+        if(subject.isApproved()) {
+            holder.subjectCheckedTextView.setCheckMarkDrawable(R.drawable.check);
+            holder.subjectCheckedTextView.setChecked(true);
+        }
+
         // perform on Click Event Listener on CheckedTextView
         holder.subjectCheckedTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Boolean value = holder.subjectCheckedTextView.isChecked();
                 if (value) {
+                    Subject subject = subjects.get(pos);
+                    subject.changeState();
                     // set check mark drawable and set checked property to false
                     holder.subjectCheckedTextView.setCheckMarkDrawable(R.drawable.check_ic);
                     holder.subjectCheckedTextView.setChecked(false);
                     Toast.makeText(context, "un-Checked", Toast.LENGTH_SHORT).show();
                 } else {
+                    Subject subject = subjects.get(pos);
+                    subject.changeState();
                     // set check mark drawable and set checked property to true
                     holder.subjectCheckedTextView.setCheckMarkDrawable(R.drawable.check);
                     holder.subjectCheckedTextView.setChecked(true);

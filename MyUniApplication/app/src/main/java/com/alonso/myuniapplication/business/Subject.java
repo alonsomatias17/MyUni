@@ -111,4 +111,8 @@ public class Subject implements Parcelable {
         }
 
     }
+
+    public boolean isApproved() {
+        return this.state.equals(APPROVED);
+    }
 }
