@@ -21,7 +21,6 @@ public class LogInActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +58,7 @@ public class LogInActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
                     Toast.makeText(LogInActivity.this,"Credenciales correctas!!!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(LogInActivity.this, MainActivity.class));
+                    startActivity(new Intent(LogInActivity.this, MenuActivity.class));
 
                 } else{
                     Toast.makeText(LogInActivity.this,"Credenciales INCORRECTAS", Toast.LENGTH_SHORT).show();
