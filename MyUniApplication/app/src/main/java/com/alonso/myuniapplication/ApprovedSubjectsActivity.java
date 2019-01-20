@@ -117,9 +117,6 @@ public class ApprovedSubjectsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         updateUserApprovedSubjects();
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra("hasBackPressed", true);
-        setResult(Activity.RESULT_OK, returnIntent);
         finish();
     }
 

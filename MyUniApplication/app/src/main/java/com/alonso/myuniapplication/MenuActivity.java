@@ -28,12 +28,11 @@ public class MenuActivity extends AppCompatActivity {
     private ActionBarDrawerToggle menuActionBarDrawerToggle;
     private NavigationView navigationView;
 
-    private User user;
-    private UserDTO userDTO;
-
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
     private FirebaseFirestore firebaseFirestore;
+
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +53,7 @@ public class MenuActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
         firebaseFirestore = FirebaseFirestore.getInstance();
-        findUserByEmailFS();
+//        findUserByEmailFS();
     }
 
     private void setNavigationListener() {
@@ -65,18 +64,17 @@ public class MenuActivity extends AppCompatActivity {
                 switch(id)
                 {
                     case R.id.nav_account:
-                        Toast.makeText(MenuActivity.this, "My Account",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MenuActivity.this, "Mi Perfil",Toast.LENGTH_SHORT).show();
 
                         Intent accountIntent = new Intent(MenuActivity.this, Profile3Activity.class);
                         accountIntent.putExtra("User", user);
-//                        startActivity(accountIntent);
-                        startActivityForResult(accountIntent, 1);
+                        startActivity(accountIntent);
                         break;
                     case R.id.nav_chat:
                         Toast.makeText(MenuActivity.this, "Chat",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.nav_asign_aprobadas:
-                        Toast.makeText(MenuActivity.this, "Info",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MenuActivity.this, "Mis Asignaturas",Toast.LENGTH_SHORT).show();
 
                         Intent ASIntent = new Intent(MenuActivity.this, ApprovedSubjectsActivity.class);
                         ASIntent.putExtra("UserToApSubject", user);
@@ -108,15 +106,10 @@ public class MenuActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 user = document.toObject(User.class);
-                                if(!user.getEmail().equals("")){
-//                                    userDTO = new UserDTO(user.getUserName(), user.getEmail());
-//                                    progressBarStatus++;
-                                }
-
-                                Log.d("findUserByEmailFS", document.getId() + " => " + document.getData());
+                                Log.i("findUserByEmailFS", document.getId() + " => " + document.getData());
                             }
                         } else {
-                            Log.w("findUserByEmailFS", "Error getting documents.", task.getException());
+                            Log.e("findUserByEmailFS", "Error getting documents.", task.getException());
                         }
                     }
                 });
@@ -131,15 +124,8 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == 1) {
-            if(resultCode == Activity.RESULT_OK){
-                boolean hasBackPressed = data.getBooleanExtra("hasBackPressed", false);
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
-            }
-        }
+    public void onResume(){
+        super.onResume();
+        findUserByEmailFS();
     }
 }
