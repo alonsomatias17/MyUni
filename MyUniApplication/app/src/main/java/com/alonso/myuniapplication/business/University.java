@@ -58,4 +58,15 @@ public class University {
                 .append(name)
                 .toString();
     }
+
+    public Career findCareer(int code) throws Exception {
+        int i = 0;
+        while(careers.size() > i && careers.get(i).getCode()!= code){
+            i++;
+        }
+        if(careers.size() > i)
+            return careers.get(i);
+        else
+            throw new Exception();
+    }
 }

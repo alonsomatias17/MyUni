@@ -1,5 +1,6 @@
 package com.alonso.myuniapplication;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -47,7 +48,6 @@ public class MenuActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
         navigationView = (NavigationView)findViewById(R.id.nav_view);
         setNavigationListener();
 
@@ -69,7 +69,8 @@ public class MenuActivity extends AppCompatActivity {
 
                         Intent accountIntent = new Intent(MenuActivity.this, Profile3Activity.class);
                         accountIntent.putExtra("User", user);
-                        startActivity(accountIntent);
+//                        startActivity(accountIntent);
+                        startActivityForResult(accountIntent, 1);
                         break;
                     case R.id.nav_chat:
                         Toast.makeText(MenuActivity.this, "Chat",Toast.LENGTH_SHORT).show();
@@ -129,5 +130,16 @@ public class MenuActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+        if (requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK){
+                boolean hasBackPressed = data.getBooleanExtra("hasBackPressed", false);
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        }
+    }
 }

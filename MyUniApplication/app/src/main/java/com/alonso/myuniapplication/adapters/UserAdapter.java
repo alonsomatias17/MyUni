@@ -45,7 +45,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         final int pos = position;
         Subject subject = subjects.get(position);
-        holder.subjectCheckedTextView.setText(subject.getName());
+        holder.subjectCheckedTextView.setText(subject.getCode() + " - " + subject.getName());
         if(subject.isApproved()) {
             holder.subjectCheckedTextView.setCheckMarkDrawable(R.drawable.check);
             holder.subjectCheckedTextView.setChecked(true);

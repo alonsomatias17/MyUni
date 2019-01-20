@@ -47,7 +47,6 @@ public class Profile3Activity extends AppCompatActivity {
     private ProgressBar progressBar;
     private int progressBarStatus = 0;
 
-    private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
 
     private static final int PBSTATUS_LOAD_FINISHED = 1;
@@ -57,10 +56,8 @@ public class Profile3Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile3);
 
-        firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
         progressBar = findViewById(R.id.progressBarProfile);
-
 
         Intent mIntent = getIntent();
         user = mIntent.getParcelableExtra("User");

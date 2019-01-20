@@ -47,8 +47,6 @@ public class SignUpActivity extends AppCompatActivity {
     University university;
 
     private FirebaseAuth firebaseAuth;
-    private DatabaseReference databaseReferenceUsers;
-    private DatabaseReference databaseReferenceUniversity;
     private FirebaseFirestore firebaseFirestore;
 
     public static final int USERNAME_MIN_LENGTH = 1;
@@ -61,8 +59,6 @@ public class SignUpActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         //TODO: delete
-//        databaseReferenceUsers = FirebaseDatabase.getInstance().getReference("user");
-//        databaseReferenceUniversity = FirebaseDatabase.getInstance().getReference("university");
         firebaseFirestore = FirebaseFirestore.getInstance();
 
         setUpViews();
@@ -189,13 +185,13 @@ public class SignUpActivity extends AppCompatActivity {
                         .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
-                                Log.d("saveUserFS", "DocumentSnapshot added with ID: " + documentReference.getId());
+                                Log.i("saveUserFS", "DocumentSnapshot added with ID: " + documentReference.getId());
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.w("saveUserFS", "Error adding document", e);
+                                Log.e("saveUserFS", "Error adding document", e);
                             }
                         });
             }
@@ -208,13 +204,13 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        Log.d("saveUniversityFS", "DocumentSnapshot added with ID: " + documentReference.getId());
+                        Log.i("saveUniversityFS", "DocumentSnapshot added with ID: " + documentReference.getId());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w("saveUniversityFS", "Error adding document", e);
+                        Log.e("saveUniversityFS", "Error adding document", e);
                     }
                 });
     }
