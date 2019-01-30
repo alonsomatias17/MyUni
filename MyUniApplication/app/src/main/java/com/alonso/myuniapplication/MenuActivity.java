@@ -1,6 +1,5 @@
 package com.alonso.myuniapplication;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,7 +12,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.alonso.myuniapplication.business.User;
-import com.alonso.myuniapplication.business.UserDTO;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -80,8 +78,12 @@ public class MenuActivity extends AppCompatActivity {
                         ASIntent.putExtra("UserToApSubject", user);
                         startActivity(ASIntent);
                         break;
-                    case R.id.nav_ongoing_subjects:
-                        Toast.makeText(MenuActivity.this, "Info",Toast.LENGTH_SHORT).show();
+                    case R.id.nav_asign_curso:
+                        Toast.makeText(MenuActivity.this, "Asignaturas en curso",Toast.LENGTH_SHORT).show();
+
+                        Intent OSIntent = new Intent(MenuActivity.this, LiveSubjectsActivity.class);
+                        OSIntent.putExtra("UserToOSubject", user);
+                        startActivity(OSIntent);
                         break;
                     case R.id.nav_information:
                         Toast.makeText(MenuActivity.this, "Info",Toast.LENGTH_SHORT).show();

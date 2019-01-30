@@ -12,7 +12,7 @@ public class User implements Parcelable {
     private String email;
     private Career career;
     private List<Subject> approvedSubjects;
-
+    private List<Subject> onGoingSubjects;
 
     public User(){
     }
@@ -21,19 +21,21 @@ public class User implements Parcelable {
         this.userName = userName;
         this.email = email;
         this.career = career;
-        approvedSubjects = new ArrayList<>();
+        this.approvedSubjects = new ArrayList<>();
+        this.onGoingSubjects = new ArrayList<>();
     }
 
     protected User(Parcel in) {
-        userName = in.readString();
-        email = in.readString();
-//        career = in.readParcelable(Career.class.getClassLoader());
-//        approvedSubjects = in.createTypedArrayList(Subject.CREATOR);
+        this.userName = in.readString();
+        this.email = in.readString();
         this.career = in.readParcelable(Career.class.getClassLoader());
 
         // read list by using User.CREATOR
-        this.approvedSubjects = new ArrayList<Subject>();
+        this.approvedSubjects = new ArrayList<>();
         in.readTypedList(approvedSubjects, Subject.CREATOR);
+
+        this.onGoingSubjects = new ArrayList<>();
+        in.readTypedList(onGoingSubjects, Subject.CREATOR);
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -80,8 +82,12 @@ public class User implements Parcelable {
         this.approvedSubjects = approvedSubjects;
     }
 
-    public void addSubject(Subject subject){
-        approvedSubjects.add(subject);
+    public List<Subject> getOnGoingSubjects() {
+        return onGoingSubjects;
+    }
+
+    public void setOnGoingSubjects(List<Subject> onGoingSubjects) {
+        this.onGoingSubjects = onGoingSubjects;
     }
 
     @Override
@@ -102,9 +108,8 @@ public class User implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(userName);
         parcel.writeString(email);
-//        parcel.writeParcelable(career, i);
-//        parcel.writeTypedList(approvedSubjects);
         parcel.writeParcelable(career, i);
         parcel.writeTypedList(approvedSubjects);
+        parcel.writeTypedList(onGoingSubjects);
     }
 }

@@ -12,7 +12,7 @@ public class Subject implements Parcelable {
     private int year;
 
     public static final String APPROVED = "Aprobada";
-    public static final String ONGOING = "En curso";
+    public static final String ON_GOING = "En curso";
     public static final String NOT_APPROVED = "No aprobada";
 
     public Subject() {
@@ -109,10 +109,13 @@ public class Subject implements Parcelable {
             this.state = NOT_APPROVED;
             return;
         }
-
     }
 
     public boolean isApproved() {
         return this.state.equals(APPROVED);
+    }
+
+    public boolean isOnGoing() {
+        return this.state.equals(ON_GOING);
     }
 }

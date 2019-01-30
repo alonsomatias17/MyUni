@@ -1,9 +1,9 @@
 package com.alonso.myuniapplication;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.alonso.myuniapplication.adapters.ApprovedSubjectsAdapter;
+import com.alonso.myuniapplication.adapters.OnGoingSubjectsAdapter;
 import com.alonso.myuniapplication.business.Career;
 import com.alonso.myuniapplication.business.Subject;
 import com.alonso.myuniapplication.business.University;
@@ -24,12 +24,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ApprovedSubjectsActivity extends AppCompatActivity {
+public class LiveSubjectsActivity extends AppCompatActivity {
+
+    private FirebaseFirestore firebaseFirestore;
 
     private User user = new User();
-    private ApprovedSubjectsAdapter approvedSubjectsAdapter;
+    private OnGoingSubjectsAdapter onGoingSubjectsAdapter;
     private University university = new University();
     private Career career;
     private List<Subject> completedSubjects;
@@ -39,20 +42,17 @@ public class ApprovedSubjectsActivity extends AppCompatActivity {
     private int progressBarStatus = 0;
     private static final int PB_STATUS_LOAD_FINISHED = 2;
 
-    private FirebaseFirestore firebaseFirestore;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_approved_subjects);
+        setContentView(R.layout.activity_live_subjects);
+
         firebaseFirestore = FirebaseFirestore.getInstance();
         getUniversityFS();
 
         Intent mIntent = getIntent();
-        user = mIntent.getParcelableExtra("UserToApSubject");
-
-        progressBar = findViewById(R.id.progressBarAppSubject);
+        user = mIntent.getParcelableExtra("UserToOSubject");
+        progressBar = findViewById(R.id.live_subject_progress_bar);
 
         new Thread(new Runnable() {
             @Override
@@ -74,8 +74,8 @@ public class ApprovedSubjectsActivity extends AppCompatActivity {
             career = university.findCareer(user.getCareer().getCode());
             setSubjectsState();
 
-            recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-            approvedSubjectsAdapter = new ApprovedSubjectsAdapter(getApplicationContext(), completedSubjects);
+            recyclerView = findViewById(R.id.live_subject_recycler_view);
+            onGoingSubjectsAdapter = new OnGoingSubjectsAdapter(getApplicationContext(), completedSubjects);
 
             runOnUiThread(new Runnable() {
 
@@ -84,32 +84,15 @@ public class ApprovedSubjectsActivity extends AppCompatActivity {
                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
 
                     recyclerView.setLayoutManager(mLayoutManager);
-                    recyclerView.addItemDecoration(new DividerItemDecoration(ApprovedSubjectsActivity.this, LinearLayoutManager.VERTICAL));
-                    recyclerView.setAdapter(approvedSubjectsAdapter);
+                    recyclerView.addItemDecoration(new DividerItemDecoration(LiveSubjectsActivity.this, LinearLayoutManager.VERTICAL));
+                    recyclerView.setAdapter(onGoingSubjectsAdapter);
 
-                    approvedSubjectsAdapter.notifyDataSetChanged();
+                    onGoingSubjectsAdapter.notifyDataSetChanged();
                 }
             });
         } catch (Exception e) {
             Log.e("ApprovedSubjectsAct", "Error setting Data", e);
         }
-    }
-
-    private void setSubjectsState() {
-        completedSubjects = career.getSubjects();
-        for(Subject subject : completedSubjects){
-            for (Subject userSubject: user.getApprovedSubjects()){
-                setSubjectStateIfIsEqual(subject, userSubject);
-            }
-            for (Subject userSubject: user.getOnGoingSubjects()){
-                setSubjectStateIfIsEqual(subject, userSubject);
-            }
-        }
-    }
-
-    private void setSubjectStateIfIsEqual(Subject subject, Subject userSubject) {
-        if(subject.getCode() == userSubject.getCode())
-            subject.setState(userSubject.getState());
     }
 
     @Override
@@ -119,7 +102,7 @@ public class ApprovedSubjectsActivity extends AppCompatActivity {
     }
 
     private void updateUserApprovedSubjects() {
-        updateUserApprovedSubjectList();
+        updateUserLiveSubjectList();
         updateUserFS();
     }
 
@@ -133,30 +116,42 @@ public class ApprovedSubjectsActivity extends AppCompatActivity {
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Log.i("ApprovedSubjectsAct", "User updated correctly");
+                                Log.i("OnGoingSubjectsAct", "User updated correctly");
 
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.e("ApprovedSubjectsAct", "Error updating user", e);
+                                Log.e("OnGoingSubjectsAct", "Error updating user", e);
                             }
                         });
             }
         }).start();
     }
 
-    private void updateUserApprovedSubjectList() {
-        user.getApprovedSubjects().clear();
+    private void updateUserLiveSubjectList() {
         user.getOnGoingSubjects().clear();
         for(Subject subject : completedSubjects){
-            if(subject.isApproved()) {
-                user.getApprovedSubjects().add(subject);
-            } else if(subject.isOnGoing()){
+             if(subject.isOnGoing())
                 user.getOnGoingSubjects().add(subject);
+        }
+    }
+
+    private void setSubjectsState() {
+        completedSubjects = career.getSubjects();
+        List<Subject> subjectsToRemove = new ArrayList<>();
+        for(Subject subject : completedSubjects){
+            for (Subject userSubject: user.getApprovedSubjects()){
+                if(subject.getCode() == userSubject.getCode())
+                    subjectsToRemove.add(subject);
+            }
+            for (Subject userSubject: user.getOnGoingSubjects()){
+                if(subject.getCode() == userSubject.getCode())
+                    subject.setState(userSubject.getState());
             }
         }
+        completedSubjects.removeAll(subjectsToRemove);
     }
 
     private void getUniversityFS(){
