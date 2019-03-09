@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:title="Nuevo Grupo"
+        android:id="@+id/chat_create_group"
+        app:showAsAction="never">
+    </item>
+    <item
+        android:title="Nuevo Chat"
+        android:id="@+id/chat_create_single_chat"
+        app:showAsAction="never">
+    </item>
+</menu>

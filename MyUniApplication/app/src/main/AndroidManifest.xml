@@ -39,7 +39,27 @@
         <activity android:name=".MenuActivity" />
         <activity android:name=".Profile3Activity" />
         <activity android:name=".ApprovedSubjectsActivity" />
-        <activity android:name=".LiveSubjectsActivity"></activity>
+        <activity android:name=".LiveSubjectsActivity" />
+        <activity
+            android:name=".ChatActivity"
+            android:label="@string/app_name"
+            android:theme="@style/ChatToolbarTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".GroupChatActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

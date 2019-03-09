@@ -8,6 +8,13 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="ChatToolbarTheme" parent="AppTheme.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimaryCT</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkCT</item>
+        <item name="colorAccent">@color/colorAccentCT</item>
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -19,5 +26,6 @@
     
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <style name="Alertdialog" parent="Base.Theme.AppCompat.Light.Dialog"></style>
 
 </resources>

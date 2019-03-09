@@ -70,6 +70,10 @@ public class MenuActivity extends AppCompatActivity {
                         break;
                     case R.id.nav_chat:
                         Toast.makeText(MenuActivity.this, "Chat",Toast.LENGTH_SHORT).show();
+
+                        Intent ChatIntent = new Intent(MenuActivity.this, ChatActivity.class);
+//                        ASIntent.putExtra("UserToApSubject", user);
+                        startActivity(ChatIntent);
                         break;
                     case R.id.nav_asign_aprobadas:
                         Toast.makeText(MenuActivity.this, "Mis Asignaturas",Toast.LENGTH_SHORT).show();
