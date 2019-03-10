@@ -1,4 +1,4 @@
-package com.alonso.myuniapplication;
+package com.alonso.myuniapplication.Chat;
 
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.alonso.myuniapplication.R;
 import com.alonso.myuniapplication.adapters.TabsAccessorAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;

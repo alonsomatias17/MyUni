@@ -5,8 +5,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.alonso.myuniapplication.ChatsFragment;
-import com.alonso.myuniapplication.GroupsFragment;
+import com.alonso.myuniapplication.Chat.ChatsFragment;
+import com.alonso.myuniapplication.Chat.GroupsFragment;
 
 public class TabsAccessorAdapter extends FragmentPagerAdapter {
 

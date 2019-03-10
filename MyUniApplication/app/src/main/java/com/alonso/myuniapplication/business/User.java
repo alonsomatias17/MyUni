@@ -13,6 +13,7 @@ public class User implements Parcelable {
     private Career career;
     private List<Subject> approvedSubjects;
     private List<Subject> onGoingSubjects;
+    private String profileImageUri;
 
     public User(){
     }
@@ -23,6 +24,7 @@ public class User implements Parcelable {
         this.career = career;
         this.approvedSubjects = new ArrayList<>();
         this.onGoingSubjects = new ArrayList<>();
+        this.profileImageUri = "";
     }
 
     protected User(Parcel in) {
@@ -36,6 +38,8 @@ public class User implements Parcelable {
 
         this.onGoingSubjects = new ArrayList<>();
         in.readTypedList(onGoingSubjects, Subject.CREATOR);
+
+        this.profileImageUri = in.readString();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -90,6 +94,14 @@ public class User implements Parcelable {
         this.onGoingSubjects = onGoingSubjects;
     }
 
+    public String getProfileImageUri() {
+        return profileImageUri;
+    }
+
+    public void setProfileImageUri(String profileImageUri) {
+        this.profileImageUri = profileImageUri;
+    }
+
     @Override
     public String toString() {
         return new StringBuilder()
@@ -111,5 +123,6 @@ public class User implements Parcelable {
         parcel.writeParcelable(career, i);
         parcel.writeTypedList(approvedSubjects);
         parcel.writeTypedList(onGoingSubjects);
+        parcel.writeString(profileImageUri);
     }
 }

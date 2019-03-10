@@ -169,8 +169,8 @@ public class SignUpActivity extends AppCompatActivity {
                 if (task.isSuccessful()){
                     Toast.makeText(SignUpActivity.this,"Registro de usuario exitoso!!", Toast.LENGTH_SHORT).show();
                     User user = new User(userName, email, career);
-                    user.getApprovedSubjects().add(career.getSubjects().get(0));
-                    user.getApprovedSubjects().add(career.getSubjects().get(1));
+//                    user.getApprovedSubjects().add(career.getSubjects().get(0));
+//                    user.getApprovedSubjects().add(career.getSubjects().get(1));
 
                     this.saveUserFS(user);
                     startActivity(new Intent(SignUpActivity.this, MenuActivity.class));
@@ -181,17 +181,16 @@ public class SignUpActivity extends AppCompatActivity {
 
             private void saveUserFS(User user) {
                 firebaseFirestore.collection("users")
-                        .add(user)
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        .document(user.getEmail())
+                        .set(user)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                Log.i("saveUserFS", "DocumentSnapshot added with ID: " + documentReference.getId());
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e("saveUserFS", "Error adding document", e);
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    Log.i("saveUserFS", "User successfully saved");
+                                } else {
+                                    Log.e("saveUserFS", "Error saving user");
+                                }
                             }
                         });
             }

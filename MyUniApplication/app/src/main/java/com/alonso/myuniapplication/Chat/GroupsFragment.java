@@ -1,4 +1,4 @@
-package com.alonso.myuniapplication;
+package com.alonso.myuniapplication.Chat;
 
 
 import android.content.Intent;
@@ -12,6 +12,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.alonso.myuniapplication.Chat.GroupChatActivity;
+import com.alonso.myuniapplication.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
