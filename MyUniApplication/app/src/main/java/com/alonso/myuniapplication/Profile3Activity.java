@@ -169,7 +169,8 @@ public class Profile3Activity extends AppCompatActivity {
         emailTV.setText(user.getEmail());
         careerTV.setText(user.getCareer().getName());
         careerDscTV.setText(user.getCareer().getDescription());
-        Picasso.get().load(user.getProfileImageUri()).into(userProfileCIV);
+        if(!user.getProfileImageUri().equals(""))
+            Picasso.get().load(user.getProfileImageUri()).into(userProfileCIV);
 
         progressBarStatus++;
     }

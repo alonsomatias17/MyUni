@@ -14,6 +14,8 @@ public class User implements Parcelable {
     private List<Subject> approvedSubjects;
     private List<Subject> onGoingSubjects;
     private String profileImageUri;
+    private List<String> singleChatKeys;
+    private List<String> groupChatKeys;
 
     public User(){
     }
@@ -25,6 +27,8 @@ public class User implements Parcelable {
         this.approvedSubjects = new ArrayList<>();
         this.onGoingSubjects = new ArrayList<>();
         this.profileImageUri = "";
+        this.singleChatKeys = new ArrayList<>();
+        this.groupChatKeys = new ArrayList<>();
     }
 
     protected User(Parcel in) {
@@ -40,6 +44,13 @@ public class User implements Parcelable {
         in.readTypedList(onGoingSubjects, Subject.CREATOR);
 
         this.profileImageUri = in.readString();
+
+        this.singleChatKeys = new ArrayList<>();
+        in.readStringList(singleChatKeys);
+
+        this.groupChatKeys = new ArrayList<>();
+        in.readStringList(groupChatKeys);
+
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -124,5 +135,7 @@ public class User implements Parcelable {
         parcel.writeTypedList(approvedSubjects);
         parcel.writeTypedList(onGoingSubjects);
         parcel.writeString(profileImageUri);
+        parcel.writeStringList(singleChatKeys);
+        parcel.writeStringList(groupChatKeys);
     }
 }

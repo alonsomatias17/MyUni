@@ -9,7 +9,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity  {
 
-    //private FirebaseAuth firebaseAuth;
 
 
     @Override
@@ -17,16 +16,5 @@ public class MainActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         startActivity(new Intent(this, MenuActivity.class));
-
-        /*firebaseAuth = FirebaseAuth.getInstance();
-
-        FirebaseUser user = firebaseAuth.getCurrentUser();
-
-        if(user != null){
-            finish();
-            //TODO send to home activity
-        } else {
-            startActivity(new Intent(this, LogInActivity.class));
-        }*/
     }
 }

@@ -128,7 +128,7 @@ public class ApprovedSubjectsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 firebaseFirestore.collection("users")
-                        .document("3SdWS6L3Tc9E1HPrp3PH")
+                        .document(user.getEmail())
                         .set(user)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
