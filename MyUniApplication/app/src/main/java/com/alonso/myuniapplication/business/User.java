@@ -14,8 +14,8 @@ public class User implements Parcelable {
     private List<Subject> approvedSubjects;
     private List<Subject> onGoingSubjects;
     private String profileImageUri;
-    private List<String> singleChatKeys;
-    private List<String> groupChatKeys;
+    private List<String> singleChatsKeys;
+    private List<String> groupChatsKeys;
 
     public User(){
     }
@@ -27,8 +27,8 @@ public class User implements Parcelable {
         this.approvedSubjects = new ArrayList<>();
         this.onGoingSubjects = new ArrayList<>();
         this.profileImageUri = "";
-        this.singleChatKeys = new ArrayList<>();
-        this.groupChatKeys = new ArrayList<>();
+        this.singleChatsKeys = new ArrayList<>();
+        this.groupChatsKeys = new ArrayList<>();
     }
 
     protected User(Parcel in) {
@@ -45,11 +45,11 @@ public class User implements Parcelable {
 
         this.profileImageUri = in.readString();
 
-        this.singleChatKeys = new ArrayList<>();
-        in.readStringList(singleChatKeys);
+        this.singleChatsKeys = new ArrayList<>();
+        in.readStringList(singleChatsKeys);
 
-        this.groupChatKeys = new ArrayList<>();
-        in.readStringList(groupChatKeys);
+        this.groupChatsKeys = new ArrayList<>();
+        in.readStringList(groupChatsKeys);
 
     }
 
@@ -113,6 +113,22 @@ public class User implements Parcelable {
         this.profileImageUri = profileImageUri;
     }
 
+    public List<String> getSingleChatsKeys() {
+        return singleChatsKeys;
+    }
+
+    public void setSingleChatsKeys(List<String> singleChatsKeys) {
+        this.singleChatsKeys = singleChatsKeys;
+    }
+
+    public List<String> getGroupChatsKeys() {
+        return groupChatsKeys;
+    }
+
+    public void setGroupChatsKeys(List<String> groupChatsKeys) {
+        this.groupChatsKeys = groupChatsKeys;
+    }
+
     @Override
     public String toString() {
         return new StringBuilder()
@@ -135,7 +151,7 @@ public class User implements Parcelable {
         parcel.writeTypedList(approvedSubjects);
         parcel.writeTypedList(onGoingSubjects);
         parcel.writeString(profileImageUri);
-        parcel.writeStringList(singleChatKeys);
-        parcel.writeStringList(groupChatKeys);
+        parcel.writeStringList(singleChatsKeys);
+        parcel.writeStringList(groupChatsKeys);
     }
 }

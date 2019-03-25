@@ -52,7 +52,7 @@ public class MenuActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
         firebaseFirestore = FirebaseFirestore.getInstance();
-//        findUserByEmailFS();
+//        getUserFS();
     }
 
     private void setNavigationListener() {
@@ -73,7 +73,7 @@ public class MenuActivity extends AppCompatActivity {
                         Toast.makeText(MenuActivity.this, "Chat",Toast.LENGTH_SHORT).show();
 
                         Intent ChatIntent = new Intent(MenuActivity.this, ChatActivity.class);
-//                        ASIntent.putExtra("UserToApSubject", user);
+                        ChatIntent.putExtra("UserToChats", user);
                         startActivity(ChatIntent);
                         break;
                     case R.id.nav_asign_aprobadas:
@@ -103,7 +103,7 @@ public class MenuActivity extends AppCompatActivity {
         });
     }
 
-    private void findUserByEmailFS(){
+    private void getUserFS(){
         firebaseFirestore.collection("users")
                 .whereEqualTo("email", firebaseUser.getEmail())
                 .get()
@@ -113,10 +113,10 @@ public class MenuActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 user = document.toObject(User.class);
-                                Log.i("findUserByEmailFS", document.getId() + " => " + document.getData());
+                                Log.i("getUserFS", document.getId() + " => " + document.getData());
                             }
                         } else {
-                            Log.e("findUserByEmailFS", "Error getting documents.", task.getException());
+                            Log.e("getUserFS", "Error getting documents.", task.getException());
                         }
                     }
                 });
@@ -133,6 +133,6 @@ public class MenuActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-        findUserByEmailFS();
+        getUserFS();
     }
 }

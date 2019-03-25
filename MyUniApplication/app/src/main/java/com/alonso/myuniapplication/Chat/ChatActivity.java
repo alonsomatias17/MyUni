@@ -1,6 +1,7 @@
 package com.alonso.myuniapplication.Chat;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -9,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -16,10 +18,17 @@ import android.widget.Toast;
 
 import com.alonso.myuniapplication.R;
 import com.alonso.myuniapplication.adapters.TabsAccessorAdapter;
+import com.alonso.myuniapplication.business.SingleChat;
+import com.alonso.myuniapplication.business.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -30,6 +39,12 @@ public class ChatActivity extends AppCompatActivity {
     private TabsAccessorAdapter myTabsAccessorAdapter;
 
     private DatabaseReference rootRef;
+    private FirebaseFirestore firebaseFirestore;
+
+
+    private User currentUser = new User();
+    private User guestUser = new User();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +63,13 @@ public class ChatActivity extends AppCompatActivity {
 
         myTabLayout = (TabLayout) findViewById(R.id.chat_tabs);
         myTabLayout.setupWithViewPager(myViewPager);
+
+        Intent mIntent = getIntent();
+        currentUser = mIntent.getParcelableExtra("UserToChats");
+
+        firebaseFirestore = FirebaseFirestore.getInstance();
+
+        //TODO: Agregar progress bar
     }
 
     @Override
@@ -67,6 +89,7 @@ public class ChatActivity extends AppCompatActivity {
                 break;
             case R.id.chat_create_single_chat:
                 Toast.makeText(ChatActivity.this, "Crear chat grupal",Toast.LENGTH_SHORT).show();
+                requestNewSingleChat();
                 break;
         }
         return true;
@@ -102,13 +125,116 @@ public class ChatActivity extends AppCompatActivity {
         builder.show();
     }
 
+    private void requestNewSingleChat() {
+        AlertDialog.Builder builder= new AlertDialog.Builder(ChatActivity.this, R.style.Alertdialog);
+
+        //TODO: Cambiar, que elija al tutor
+        builder.setTitle("Enter Chat Name:");
+
+        final EditText chatNameField = new EditText(ChatActivity.this);
+        chatNameField.setHint("Ej. Tutor de Física");
+
+        builder.setView(chatNameField);
+        builder.setPositiveButton("Crear", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String chatName = chatNameField.getText().toString();
+                if(TextUtils.isEmpty(chatName)){
+                    Toast.makeText(ChatActivity.this, "Por favor escriba el nombre del chat",Toast.LENGTH_SHORT).show();
+
+                } else {
+                    createNewSingleChat(chatName);
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
     private void createNewGroup(final String groupName) {
         rootRef.child("Groups").child(groupName).setValue("")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
+                            //TODO: Agregar la key al currentUser
+                            updateUserFS(currentUser.getEmail());
                             Toast.makeText(ChatActivity.this, "El grupo: " + groupName + " fue creado exitosamente",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private void createNewSingleChat(final String chatName) {
+        final String key = rootRef.child("SingleChats").push().getKey();
+        //TODO: Crear objeto single chat con valores reales
+        SingleChat singleChat = new SingleChat();
+        singleChat.getParticipants().add(currentUser.getEmail());
+        singleChat.getParticipants().add("julian@myuni.com");
+        getUserFS("julian@myuni.com");
+
+        rootRef.child("SingleChats").child(key).setValue(singleChat)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            //TODO: Agregar la key al currentUser
+                            currentUser.getGroupChatsKeys().add(key);
+                            updateUserFS(currentUser.getEmail());
+
+                            //TODO: Chequeat si ya lo trajo o hacer una task
+                            updateUserFS(guestUser.getEmail());
+                            Toast.makeText(ChatActivity.this, "El chat: " + chatName + " fue creado exitosamente",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private void updateUserFS(final String userEmail) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                firebaseFirestore.collection("users")
+                        .document(userEmail)
+                        .set(currentUser)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.i("ChatActivity", "User updated correctly");
+
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e("ChatActivity", "Error updating currentUser", e);
+                            }
+                        });
+            }
+        }).start();
+    }
+
+    private void getUserFS(String userEmail){
+        firebaseFirestore.collection("users")
+                .whereEqualTo("email", userEmail)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                guestUser = document.toObject(User.class);
+                                Log.i("getUserFS", document.getId() + " => " + document.getData());
+                            }
+                        } else {
+                            Log.e("getUserFS", "Error getting documents.", task.getException());
                         }
                     }
                 });
