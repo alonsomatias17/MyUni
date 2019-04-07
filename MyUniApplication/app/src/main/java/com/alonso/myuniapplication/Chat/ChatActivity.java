@@ -20,15 +20,16 @@ import com.alonso.myuniapplication.R;
 import com.alonso.myuniapplication.adapters.TabsAccessorAdapter;
 import com.alonso.myuniapplication.business.SingleChat;
 import com.alonso.myuniapplication.business.User;
+import com.alonso.myuniapplication.business.UserDTO;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -41,9 +42,12 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference rootRef;
     private FirebaseFirestore firebaseFirestore;
 
+    FirebaseFirestore db;
+    DocumentReference userRef;
+
 
     private User currentUser = new User();
-    private User guestUser = new User();
+    private User guestUser = new User("");
 
 
     @Override
@@ -52,6 +56,8 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         rootRef = FirebaseDatabase.getInstance().getReference();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         mToolbar = (Toolbar) findViewById(R.id.chat_page_toolbar);
         setSupportActionBar(mToolbar);
@@ -66,9 +72,6 @@ public class ChatActivity extends AppCompatActivity {
 
         Intent mIntent = getIntent();
         currentUser = mIntent.getParcelableExtra("UserToChats");
-
-        firebaseFirestore = FirebaseFirestore.getInstance();
-
         //TODO: Agregar progress bar
     }
 
@@ -143,7 +146,7 @@ public class ChatActivity extends AppCompatActivity {
                     Toast.makeText(ChatActivity.this, "Por favor escriba el nombre del chat",Toast.LENGTH_SHORT).show();
 
                 } else {
-                    createNewSingleChat(chatName);
+                    createNewSingleChatForUser("julian@myuni.com", chatName);
                 }
             }
         });
@@ -158,6 +161,28 @@ public class ChatActivity extends AppCompatActivity {
         builder.show();
     }
 
+    private void createNewSingleChatForUser(String guestUserEmail, final String chatName) {
+        userRef = db.collection("users").document(guestUserEmail);
+        userRef.get()
+                .addOnCompleteListener(new OnCompleteListener < DocumentSnapshot > () {
+                    @Override
+                    public void onComplete(@NonNull Task < DocumentSnapshot > task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot doc = task.getResult();
+                            guestUser = doc.toObject(User.class);
+                            Log.i("getUserFS", doc.getId() + " => " + doc.getData());
+                            createNewSingleChat(chatName);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("getUserFS", "Error getting user");
+                    }
+                });
+    }
+
     private void createNewGroup(final String groupName) {
         rootRef.child("Groups").child(groupName).setValue("")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -165,7 +190,7 @@ public class ChatActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
                             //TODO: Agregar la key al currentUser
-                            updateUserFS(currentUser.getEmail());
+                            updateUserFS(currentUser);
                             Toast.makeText(ChatActivity.this, "El grupo: " + groupName + " fue creado exitosamente",Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -176,9 +201,8 @@ public class ChatActivity extends AppCompatActivity {
         final String key = rootRef.child("SingleChats").push().getKey();
         //TODO: Crear objeto single chat con valores reales
         SingleChat singleChat = new SingleChat();
-        singleChat.getParticipants().add(currentUser.getEmail());
-        singleChat.getParticipants().add("julian@myuni.com");
-        getUserFS("julian@myuni.com");
+        singleChat.getParticipants().add(userToUserDTO(currentUser));
+        singleChat.getParticipants().add(userToUserDTO(guestUser));
 
         rootRef.child("SingleChats").child(key).setValue(singleChat)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -186,57 +210,43 @@ public class ChatActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
                             //TODO: Agregar la key al currentUser
-                            currentUser.getGroupChatsKeys().add(key);
-                            updateUserFS(currentUser.getEmail());
+                            currentUser.getSingleChatsKeys().add(key);
+                            updateUserFS(currentUser);
 
-                            //TODO: Chequeat si ya lo trajo o hacer una task
-                            updateUserFS(guestUser.getEmail());
+                            //TODO: Chequear si ya lo trajo o hacer una task
+                            guestUser.getSingleChatsKeys().add(key);
+                            updateUserFS(guestUser);
                             Toast.makeText(ChatActivity.this, "El chat: " + chatName + " fue creado exitosamente",Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
 
-    private void updateUserFS(final String userEmail) {
+    private UserDTO userToUserDTO(User user) {
+        return new UserDTO(user.getUserName(), user.getEmail(), user.getProfileImageUri());
+    }
+
+    private void updateUserFS(final User user) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 firebaseFirestore.collection("users")
-                        .document(userEmail)
-                        .set(currentUser)
+                        .document(user.getEmail())
+                        .set(user)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Log.i("ChatActivity", "User updated correctly");
+                                Log.i("ChatActivity", "User " + user.getEmail() + " updated correctly");
 
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.e("ChatActivity", "Error updating currentUser", e);
+                                Log.e("ChatActivity", "Error updating user " + user.getEmail(), e);
                             }
                         });
             }
         }).start();
-    }
-
-    private void getUserFS(String userEmail){
-        firebaseFirestore.collection("users")
-                .whereEqualTo("email", userEmail)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                guestUser = document.toObject(User.class);
-                                Log.i("getUserFS", document.getId() + " => " + document.getData());
-                            }
-                        } else {
-                            Log.e("getUserFS", "Error getting documents.", task.getException());
-                        }
-                    }
-                });
     }
 }

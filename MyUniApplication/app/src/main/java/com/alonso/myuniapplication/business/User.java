@@ -20,6 +20,17 @@ public class User implements Parcelable {
     public User(){
     }
 
+    public User(String x){
+        this.userName = "";
+        this.email = "";
+        this.career = new Career();
+        this.approvedSubjects = new ArrayList<>();
+        this.onGoingSubjects = new ArrayList<>();
+        this.profileImageUri = "";
+        this.singleChatsKeys = new ArrayList<>();
+        this.groupChatsKeys = new ArrayList<>();
+    }
+
     public User(String userName, String email, Career career) {
         this.userName = userName;
         this.email = email;
@@ -50,7 +61,6 @@ public class User implements Parcelable {
 
         this.groupChatsKeys = new ArrayList<>();
         in.readStringList(groupChatsKeys);
-
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {

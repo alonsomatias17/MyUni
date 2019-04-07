@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -104,7 +105,7 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     private void getUserFS(){
-        firebaseFirestore.collection("users")
+        /*firebaseFirestore.collection("users")
                 .whereEqualTo("email", firebaseUser.getEmail())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -113,13 +114,28 @@ public class MenuActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 user = document.toObject(User.class);
-                                Log.i("getUserFS", document.getId() + " => " + document.getData());
+                                Log.i("MenuActivity", document.getId() + " => " + document.getData());
                             }
                         } else {
-                            Log.e("getUserFS", "Error getting documents.", task.getException());
+                            Log.e("MenuActivity", "Error getting documents.", task.getException());
                         }
                     }
-                });
+                });*/
+
+        firebaseFirestore.collection("users")
+                .document(firebaseUser.getEmail())
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    user = document.toObject(User.class);
+                    Log.i("getUserFS", document.getId() + " => " + document.getData());
+                } else {
+                    Log.e("getUserFS", "Error getting documents.", task.getException());
+                }
+            }
+        });
     }
 
     @Override

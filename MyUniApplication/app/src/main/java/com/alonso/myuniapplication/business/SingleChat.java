@@ -5,7 +5,7 @@ import java.util.List;
 
 public class SingleChat {
 
-    private List<String> participants;
+    private List<UserDTO> participants;
     private List<ChatMessage> messages;
 
     public SingleChat() {
@@ -13,11 +13,11 @@ public class SingleChat {
         messages = new ArrayList<>();
     }
 
-    public List<String> getParticipants() {
+    public List<UserDTO> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(List<String> participants) {
+    public void setParticipants(List<UserDTO> participants) {
         this.participants = participants;
     }
 
@@ -27,5 +27,9 @@ public class SingleChat {
 
     public void setMessages(List<ChatMessage> messages) {
         this.messages = messages;
+    }
+
+    public void addMessage(ChatMessage chatMessage) {
+        messages.add(chatMessage);
     }
 }

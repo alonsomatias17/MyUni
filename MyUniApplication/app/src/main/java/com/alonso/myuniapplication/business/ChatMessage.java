@@ -2,6 +2,7 @@ package com.alonso.myuniapplication.business;
 
 public class ChatMessage {
 
+    private String senderEmail;
     private String date;
     private String message;
     private String name;
@@ -10,11 +11,20 @@ public class ChatMessage {
     public ChatMessage() {
     }
 
-    public ChatMessage(String date, String message, String name, String time) {
+    public ChatMessage(String senderEmail, String date, String message, String name, String time) {
+        this.senderEmail = senderEmail;
         this.date = date;
         this.message = message;
         this.name = name;
         this.time = time;
+    }
+
+    public String getSenderEmail() {
+        return senderEmail;
+    }
+
+    public void setSenderEmail(String senderEmail) {
+        this.senderEmail = senderEmail;
     }
 
     public String getDate() {

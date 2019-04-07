@@ -71,7 +71,7 @@ public class GroupsFragment extends Fragment {
                 Set<String> set = new HashSet<>();
                 Iterator iterator = dataSnapshot.getChildren().iterator();
                 while (iterator.hasNext()){
-                    set.add(((DataSnapshot)iterator.next()).getKey());
+                    set.add( ((DataSnapshot)iterator.next()).getKey() );
                 }
                 groups.clear();
                 groups.addAll(set);
