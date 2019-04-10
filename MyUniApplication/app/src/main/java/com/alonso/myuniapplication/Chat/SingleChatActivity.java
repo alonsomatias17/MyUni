@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alonso.myuniapplication.R;
+import com.alonso.myuniapplication.adapters.MessageAdapter;
 import com.alonso.myuniapplication.business.ChatMessage;
 import com.alonso.myuniapplication.business.SingleChat;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -29,7 +32,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -48,8 +53,13 @@ public class SingleChatActivity extends AppCompatActivity {
 
     private ImageButton sendMessageButton;
     private EditText messageInputText;
+    private RecyclerView userMessages;
 
     private SingleChat currentSingleChat;
+
+    private List<ChatMessage> chatMessages = new ArrayList<>();
+    private LinearLayoutManager linearLayoutManager;
+    private MessageAdapter messageAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +86,6 @@ public class SingleChatActivity extends AppCompatActivity {
                 sendMessage();
             }
         });
-//        Toast.makeText(SingleChatActivity.this, "chat_id: " + messageReceiverID, Toast.LENGTH_SHORT).show();
-//        Toast.makeText(SingleChatActivity.this, "visit_user_id: " + messageReceiverName, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -89,6 +97,8 @@ public class SingleChatActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.i("SingleChatActivity", "Get current single chat done");
                 currentSingleChat = dataSnapshot.getValue(SingleChat.class);
+                chatMessages=currentSingleChat.getMessages();
+                messageAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -121,7 +131,14 @@ public class SingleChatActivity extends AppCompatActivity {
         guestUserProfileImage = (CircleImageView) findViewById(R.id.profile_chat_image);
         sendMessageButton = (ImageButton) findViewById(R.id.single_chat_send_message_button);
         messageInputText = (EditText) findViewById(R.id.input_single_chat_message);
+        messageAdapter = new MessageAdapter(chatMessages);
+        userMessages = (RecyclerView) findViewById(R.id.private_messages_list_of_users);
+        linearLayoutManager = new LinearLayoutManager(this);
+        userMessages.setLayoutManager(linearLayoutManager);
+        userMessages.setAdapter(messageAdapter);
     }
+
+
 
     private void sendMessage(){
         String messageTest = messageInputText.getText().toString();
