@@ -88,14 +88,14 @@ public class SignUpActivity extends AppCompatActivity {
                                     universities.add(university);
 
                                     careerSP = (Spinner) findViewById(R.id.careerSP);
-                                    ArrayAdapter<Career> dataAdapter1 = new ArrayAdapter<Career>(SignUpActivity.this, android.R.layout.simple_spinner_item, universities.get(0).getCareers());
-                                    dataAdapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                    careerSP.setAdapter(dataAdapter1);
+                                    ArrayAdapter<Career> careerAdapter = new ArrayAdapter<Career>(SignUpActivity.this, android.R.layout.simple_spinner_item, universities.get(0).getCareers());
+                                    careerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                    careerSP.setAdapter(careerAdapter);
 
                                     universitySP = (Spinner) findViewById(R.id.univercitySP);
-                                    ArrayAdapter<University> dataAdapter = new ArrayAdapter<University>(SignUpActivity.this, android.R.layout.simple_spinner_item, universities);
-                                    dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                    universitySP.setAdapter(dataAdapter);
+                                    ArrayAdapter<University> universityAdapter = new ArrayAdapter<University>(SignUpActivity.this, android.R.layout.simple_spinner_item, universities);
+                                    universityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                    universitySP.setAdapter(universityAdapter);
                                 }
                                 Log.d("findUserByEmailFS", document.getId() + " => " + document.getData());
                             }
@@ -168,10 +168,8 @@ public class SignUpActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()){
                     Toast.makeText(SignUpActivity.this,"Registro de usuario exitoso!!", Toast.LENGTH_SHORT).show();
-                    User user = new User(userName, email, career);
-//                    user.getApprovedSubjects().add(career.getSubjects().get(0));
-//                    user.getApprovedSubjects().add(career.getSubjects().get(1));
 
+                    User user = new User(userName, email, career);
                     this.saveUserFS(user);
                     startActivity(new Intent(SignUpActivity.this, MenuActivity.class));
                 } else {

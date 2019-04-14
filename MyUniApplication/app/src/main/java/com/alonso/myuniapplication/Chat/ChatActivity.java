@@ -91,8 +91,15 @@ public class ChatActivity extends AppCompatActivity {
                 requestNewGroup();
                 break;
             case R.id.chat_create_single_chat:
-                Toast.makeText(ChatActivity.this, "Crear chat grupal",Toast.LENGTH_SHORT).show();
-                requestNewSingleChat();
+                if(currentUser.getOnGoingSubjects().isEmpty()) {
+                    Toast.makeText(ChatActivity.this, "Debes tener al menos una materia en curso para tener un tutor o crear un grupo de estudio", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(ChatActivity.this, "Crear chat individual",Toast.LENGTH_SHORT).show();
+                    Intent createSCIntent = new Intent(ChatActivity.this, CreateSingleChatActivity.class);
+                    createSCIntent.putExtra("NewSingleChatUser", currentUser);
+                    startActivity(createSCIntent);
+//                requestNewSingleChat();
+                }
                 break;
         }
         return true;

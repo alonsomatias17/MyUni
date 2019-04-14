@@ -87,6 +87,13 @@ public class Subject implements Parcelable {
     }
 
     @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(code + " - " +name)
+                .toString();
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }

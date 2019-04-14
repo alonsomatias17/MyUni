@@ -44,7 +44,7 @@ public class SingleChatActivity extends AppCompatActivity {
     private DatabaseReference rootRef, singleChatReef;
     private ValueEventListener mSingleChatListener;
 
-    private String messageReceiverID, messageReceiverName, getMessageReceiverImage;
+    private String singleChatKey, messageReceiverName, getMessageReceiverImage;
 
     private TextView guestUserNameTV;
     private CircleImageView guestUserProfileImage;
@@ -53,26 +53,27 @@ public class SingleChatActivity extends AppCompatActivity {
 
     private ImageButton sendMessageButton;
     private EditText messageInputText;
-    private RecyclerView userMessages;
 
     private SingleChat currentSingleChat;
 
     private List<ChatMessage> chatMessages = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
     private MessageAdapter messageAdapter;
+    private RecyclerView userMessagesReciclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_chat);
 
-        messageReceiverID = getIntent().getExtras().get("chat_id").toString();
+        singleChatKey = getIntent().getExtras().get("chat_id").toString();
+        singleChatKey = "-LbU4U_YmIuUn2x8Dzjf";
         messageReceiverName = getIntent().getExtras().get("visit_user_id").toString();
         getMessageReceiverImage = getIntent().getExtras().get("visit_user_profile_image").toString();
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         rootRef = FirebaseDatabase.getInstance().getReference();
-        singleChatReef = FirebaseDatabase.getInstance().getReference().child("SingleChats").child("-LbU4U_YmIuUn2x8Dzjf");
+        singleChatReef = FirebaseDatabase.getInstance().getReference().child("SingleChats").child(singleChatKey);
 
         InitializeFields();
 
@@ -92,7 +93,7 @@ public class SingleChatActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
-        ValueEventListener singleChatListener = new ValueEventListener() {
+        /*ValueEventListener singleChatListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.i("SingleChatActivity", "Get current single chat done");
@@ -110,7 +111,31 @@ public class SingleChatActivity extends AppCompatActivity {
         // [END post_value_event_listener]
 
         // Keep copy of post listener so we can remove it when app stops
-        mSingleChatListener = singleChatListener;
+        mSingleChatListener = singleChatListener;*/
+
+        rootRef.child("SingleChats").child(singleChatKey)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Log.i("SingleChatActivity", "Get current single chat done");
+                        currentSingleChat = dataSnapshot.getValue(SingleChat.class);
+                        bindMessages(chatMessages, currentSingleChat.getMessages());
+                        messageAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+        Log.i("SingleChatActivity", "Amount of chats: " + messageAdapter.getItemCount());
+    }
+
+    private void bindMessages(List<ChatMessage> messagesToLoad, List<ChatMessage> messagesForLoad) {
+        messagesToLoad.clear();
+        for(ChatMessage chatMessage: messagesForLoad){
+            messagesToLoad.add(chatMessage);
+        }
     }
 
     private void InitializeFields() {
@@ -131,11 +156,24 @@ public class SingleChatActivity extends AppCompatActivity {
         guestUserProfileImage = (CircleImageView) findViewById(R.id.profile_chat_image);
         sendMessageButton = (ImageButton) findViewById(R.id.single_chat_send_message_button);
         messageInputText = (EditText) findViewById(R.id.input_single_chat_message);
+
         messageAdapter = new MessageAdapter(chatMessages);
-        userMessages = (RecyclerView) findViewById(R.id.private_messages_list_of_users);
+
+        /*runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                userMessagesReciclerView = (RecyclerView) findViewById(R.id.private_messages_list_of_users);
+                linearLayoutManager = new LinearLayoutManager(SingleChatActivity.this);
+                userMessagesReciclerView.setLayoutManager(linearLayoutManager);
+                userMessagesReciclerView.setAdapter(messageAdapter);
+                messageAdapter.notifyDataSetChanged();
+            }
+        });*/
+        userMessagesReciclerView = (RecyclerView) findViewById(R.id.private_messages_list_of_users);
         linearLayoutManager = new LinearLayoutManager(this);
-        userMessages.setLayoutManager(linearLayoutManager);
-        userMessages.setAdapter(messageAdapter);
+        userMessagesReciclerView.setLayoutManager(linearLayoutManager);
+        userMessagesReciclerView.setAdapter(messageAdapter);
     }
 
 
@@ -148,6 +186,7 @@ public class SingleChatActivity extends AppCompatActivity {
             ChatMessage chatMessage = createChatMessage(messageInputText.getText().toString());
             currentSingleChat.addMessage(chatMessage);
 
+            messageInputText.setText("");
             singleChatReef.setValue(currentSingleChat).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {

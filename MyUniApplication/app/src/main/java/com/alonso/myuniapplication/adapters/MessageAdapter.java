@@ -1,5 +1,6 @@
 package com.alonso.myuniapplication.adapters;
 
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -49,15 +50,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @NonNull
     @Override
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.custom_messages_layout, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.custom_messages_layout, parent, false);
+
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         return new MessageViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         ChatMessage chatMessage = userMessages.get(position);
         String userSenderEmail = chatMessage.getSenderEmail();
+        String message = chatMessage.getMessage();
 
        /* singleChatReef = FirebaseDatabase.getInstance().getReference().child("SingleChats").child("chatID");
 
@@ -82,7 +86,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         if(userSenderEmail.equals(firebaseUser.getEmail())){
             holder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
-            holder.senderMessageText.setText(chatMessage.getMessage());
+            holder.senderMessageText.setTextColor(Color.BLACK);
+            holder.senderMessageText.setText(message);
 
         } else {
             holder.senderMessageText.setVisibility(View.INVISIBLE);
@@ -90,7 +95,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             holder.receiverProfileImage.setVisibility(View.VISIBLE);
 
             holder.receiverMessageText.setBackgroundResource(R.drawable.receiver_messages_layout);
-            holder.receiverMessageText.setText(chatMessage.getMessage());
+            holder.receiverMessageText.setTextColor(Color.BLACK);
+            holder.receiverMessageText.setText(message);
         }
     }
 

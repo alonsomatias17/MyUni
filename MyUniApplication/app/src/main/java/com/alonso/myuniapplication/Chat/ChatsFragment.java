@@ -141,6 +141,7 @@ public class ChatsFragment extends Fragment {
                 List<SingleChat> singleChatsTemp = new ArrayList<>();
                 Iterator chatIterator = dataSnapshot.getChildren().iterator();
                 Iterator keyIterator = dataSnapshot.getChildren().iterator();
+
                 while (keyIterator.hasNext() && chatIterator.hasNext()){
                     SingleChat singleChat = ((DataSnapshot)chatIterator.next()).getValue(SingleChat.class);
                     String key = ((DataSnapshot)keyIterator.next()).getKey();
