@@ -78,6 +78,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         holder.receiverMessageText.setVisibility(View.INVISIBLE);
         holder.receiverProfileImage.setVisibility(View.INVISIBLE);
+        holder.senderMessageText.setVisibility(View.INVISIBLE);
 
         Picasso.get()
                 .load("https://firebasestorage.googleapis.com/v0/b/myuni-aade3.appspot.com/o/Profile%20Images%2Fmatias.alonso%40myuni.com.jpg?alt=media&token=f0726978-8076-463e-a3c5-cf701531621f")
@@ -85,12 +86,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
 
         if(userSenderEmail.equals(firebaseUser.getEmail())){
+            holder.senderMessageText.setVisibility(View.VISIBLE);
             holder.senderMessageText.setBackgroundResource(R.drawable.sender_messages_layout);
             holder.senderMessageText.setTextColor(Color.BLACK);
             holder.senderMessageText.setText(message);
 
         } else {
-            holder.senderMessageText.setVisibility(View.INVISIBLE);
             holder.receiverMessageText.setVisibility(View.VISIBLE);
             holder.receiverProfileImage.setVisibility(View.VISIBLE);
 

@@ -59,7 +59,7 @@ public class SingleChatActivity extends AppCompatActivity {
     private List<ChatMessage> chatMessages = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
     private MessageAdapter messageAdapter;
-    private RecyclerView userMessagesReciclerView;
+    private RecyclerView userMessagesRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +121,7 @@ public class SingleChatActivity extends AppCompatActivity {
                         currentSingleChat = dataSnapshot.getValue(SingleChat.class);
                         bindMessages(chatMessages, currentSingleChat.getMessages());
                         messageAdapter.notifyDataSetChanged();
+                        userMessagesRecyclerView.smoothScrollToPosition(userMessagesRecyclerView.getAdapter().getItemCount());
                     }
 
                     @Override
@@ -163,17 +164,17 @@ public class SingleChatActivity extends AppCompatActivity {
 
             @Override
             public void run() {
-                userMessagesReciclerView = (RecyclerView) findViewById(R.id.private_messages_list_of_users);
+                userMessagesRecyclerView = (RecyclerView) findViewById(R.id.private_messages_list_of_users);
                 linearLayoutManager = new LinearLayoutManager(SingleChatActivity.this);
-                userMessagesReciclerView.setLayoutManager(linearLayoutManager);
-                userMessagesReciclerView.setAdapter(messageAdapter);
+                userMessagesRecyclerView.setLayoutManager(linearLayoutManager);
+                userMessagesRecyclerView.setAdapter(messageAdapter);
                 messageAdapter.notifyDataSetChanged();
             }
         });*/
-        userMessagesReciclerView = (RecyclerView) findViewById(R.id.private_messages_list_of_users);
+        userMessagesRecyclerView = (RecyclerView) findViewById(R.id.private_messages_list_of_users);
         linearLayoutManager = new LinearLayoutManager(this);
-        userMessagesReciclerView.setLayoutManager(linearLayoutManager);
-        userMessagesReciclerView.setAdapter(messageAdapter);
+        userMessagesRecyclerView.setLayoutManager(linearLayoutManager);
+        userMessagesRecyclerView.setAdapter(messageAdapter);
     }
 
 
