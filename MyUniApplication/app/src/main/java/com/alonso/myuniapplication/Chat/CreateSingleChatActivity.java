@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.alonso.myuniapplication.MenuActivity;
 import com.alonso.myuniapplication.R;
 import com.alonso.myuniapplication.business.SingleChat;
 import com.alonso.myuniapplication.business.Subject;
@@ -40,7 +39,7 @@ public class CreateSingleChatActivity extends AppCompatActivity {
 
     private Spinner subjectSP;
     private Spinner tutorSP;
-    private Button creatSingleChatBT;
+    private Button createSingleChatBT;
 
     private User currentUser = new User();
     HashMap<Integer,  List<String>> tutorsByKey = new HashMap<>();
@@ -75,7 +74,7 @@ public class CreateSingleChatActivity extends AppCompatActivity {
 
         subjectSP  = (Spinner) findViewById(R.id.subjectSpinner);
         tutorSP  = (Spinner) findViewById(R.id.tutorSpinner);
-        creatSingleChatBT = (Button) findViewById(R.id.createChatButton);
+        createSingleChatBT = (Button) findViewById(R.id.createChatButton);
 
         subjectSpinnerListener();
         createSingleChatListener();
@@ -103,7 +102,7 @@ public class CreateSingleChatActivity extends AppCompatActivity {
     }
 
     private void createSingleChatListener() {
-        creatSingleChatBT.setOnClickListener(new View.OnClickListener() {
+        createSingleChatBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Subject subject = (Subject) subjectSP.getSelectedItem();
