@@ -16,6 +16,7 @@ public class User implements Parcelable {
     private String profileImageUri;
     private List<String> singleChatsKeys;
     private List<String> groupChatsKeys;
+    private List<Integer> tutorSubjectsKeys;
 
     public User(){
     }
@@ -29,6 +30,7 @@ public class User implements Parcelable {
         this.profileImageUri = "";
         this.singleChatsKeys = new ArrayList<>();
         this.groupChatsKeys = new ArrayList<>();
+        this.tutorSubjectsKeys = new ArrayList<>();
     }
 
     public User(String userName, String email, Career career) {
@@ -40,6 +42,7 @@ public class User implements Parcelable {
         this.profileImageUri = "";
         this.singleChatsKeys = new ArrayList<>();
         this.groupChatsKeys = new ArrayList<>();
+        this.tutorSubjectsKeys = new ArrayList<>();
     }
 
     protected User(Parcel in) {
@@ -61,6 +64,9 @@ public class User implements Parcelable {
 
         this.groupChatsKeys = new ArrayList<>();
         in.readStringList(groupChatsKeys);
+
+        this.tutorSubjectsKeys = new ArrayList<>();
+        in.readList(tutorSubjectsKeys, null);
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -139,6 +145,14 @@ public class User implements Parcelable {
         this.groupChatsKeys = groupChatsKeys;
     }
 
+    public List<Integer> getTutorSubjectsKeys() {
+        return tutorSubjectsKeys;
+    }
+
+    public void setTutorSubjectsKeys(List<Integer> tutorSubjectsKeys) {
+        this.tutorSubjectsKeys = tutorSubjectsKeys;
+    }
+
     @Override
     public String toString() {
         return new StringBuilder()
@@ -163,5 +177,6 @@ public class User implements Parcelable {
         parcel.writeString(profileImageUri);
         parcel.writeStringList(singleChatsKeys);
         parcel.writeStringList(groupChatsKeys);
+        parcel.writeList(tutorSubjectsKeys);
     }
 }

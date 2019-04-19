@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Chat.CreateSingleChatActivity"></activity>
+        <activity android:name=".TutorsActivity"></activity>
+        <activity android:name=".Chat.CreateSingleChatActivity" />
         <!--
         <activity
             android:name=".MainActivity"

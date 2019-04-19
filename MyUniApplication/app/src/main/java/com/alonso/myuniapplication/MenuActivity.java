@@ -18,9 +18,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import javax.annotation.Nullable;
 
 public class MenuActivity extends AppCompatActivity {
 
@@ -91,6 +95,14 @@ public class MenuActivity extends AppCompatActivity {
                         OSIntent.putExtra("UserToOSubject", user);
                         startActivity(OSIntent);
                         break;
+
+                    case R.id.nav_asign_tutoria:
+                        Toast.makeText(MenuActivity.this, "Mis Tutorias",Toast.LENGTH_SHORT).show();
+
+                        Intent tutorIntent = new Intent(MenuActivity.this, TutorsActivity.class);
+                        tutorIntent.putExtra("UserToTutor", user);
+                        startActivity(tutorIntent);
+                        break;
                     case R.id.nav_information:
                         Toast.makeText(MenuActivity.this, "Info",Toast.LENGTH_SHORT).show();
                         break;
@@ -149,6 +161,33 @@ public class MenuActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-        getUserFS();
+//        getUserFS();
+        userListenerFS();
+    }
+
+    private void userListenerFS() {
+        firebaseFirestore.collection("users")
+                .document(firebaseUser.getEmail())
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    System.err.println("Listen failed: " + e);
+                    return;
+                }
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    user = documentSnapshot.toObject(User.class);
+                    Log.i("getUserFS", documentSnapshot.getId() + " => " + documentSnapshot.getData());
+
+                    System.out.println("Current data: " + documentSnapshot.getData());
+                } else {
+                    System.out.print("Current data: null");
+                    Log.e("getUserFS", "Error getting documents.");
+
+                }
+            }
+        });
     }
 }

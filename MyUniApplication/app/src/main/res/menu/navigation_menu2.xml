@@ -13,6 +13,9 @@
         <item android:id="@+id/nav_asign_curso"
             android:icon="@mipmap/baseline_assignment_black_18dp"
             android:title="Asignaturas en Curso" />
+        <item android:id="@+id/nav_asign_tutoria"
+            android:icon="@drawable/ic_school_black_24dp"
+            android:title="Mis Tutorias" />
         <item android:id="@+id/nav_information"
             android:icon="@mipmap/baseline_info_black_18dp"
             android:title="Información" />
