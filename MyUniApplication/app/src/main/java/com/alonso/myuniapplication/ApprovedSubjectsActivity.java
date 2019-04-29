@@ -24,6 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class ApprovedSubjectsActivity extends AppCompatActivity {
@@ -38,6 +39,7 @@ public class ApprovedSubjectsActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private int progressBarStatus = 0;
     private static final int PB_STATUS_LOAD_FINISHED = 2;
+
 
     private FirebaseFirestore firebaseFirestore;
 
@@ -75,7 +77,7 @@ public class ApprovedSubjectsActivity extends AppCompatActivity {
             setSubjectsState();
 
             recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-            approvedSubjectsAdapter = new ApprovedSubjectsAdapter(getApplicationContext(), completedSubjects);
+            approvedSubjectsAdapter = new ApprovedSubjectsAdapter(getApplicationContext(), completedSubjects, user.getEmail());
 
             runOnUiThread(new Runnable() {
 

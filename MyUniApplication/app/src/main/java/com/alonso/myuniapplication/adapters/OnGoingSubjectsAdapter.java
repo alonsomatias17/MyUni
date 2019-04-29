@@ -11,16 +11,19 @@ import android.widget.Toast;
 import com.alonso.myuniapplication.R;
 import com.alonso.myuniapplication.business.Subject;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class OnGoingSubjectsAdapter extends RecyclerView.Adapter<OnGoingSubjectsAdapter.MyViewHolder>{
 
     private List<Subject> subjects;
+    HashMap<Integer, Boolean> onGoingSubjects;
     Context context;
 
-    public OnGoingSubjectsAdapter(Context context, List<Subject> subjects) {
+    public OnGoingSubjectsAdapter(Context context, List<Subject> subjects, HashMap<Integer, Boolean> onGoingSubjects) {
         this.subjects = subjects;
         this.context = context;
+        this.onGoingSubjects = onGoingSubjects;
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -64,15 +67,17 @@ public class OnGoingSubjectsAdapter extends RecyclerView.Adapter<OnGoingSubjects
             @Override
             public void onClick(View v) {
                 Boolean value = holder.subjectCheckedTextView.isChecked();
+                Subject subject = subjects.get(pos);
+
                 if (value) {
-                    Subject subject = subjects.get(pos);
+                    onGoingSubjects.remove(subject.getCode());
                     subject.setState(Subject.NOT_APPROVED);
                     // set check mark drawable and set checked property to false
                     holder.subjectCheckedTextView.setCheckMarkDrawable(R.drawable.check_ic);
                     holder.subjectCheckedTextView.setChecked(false);
                     Toast.makeText(context, "un-Checked", Toast.LENGTH_SHORT).show();
                 } else {
-                    Subject subject = subjects.get(pos);
+                    onGoingSubjects.put(subject.getCode(), true);
                     subject.setState(Subject.ON_GOING);
                     // set check mark drawable and set checked property to true
                     holder.subjectCheckedTextView.setCheckMarkDrawable(R.drawable.ic_create_black_24dp);

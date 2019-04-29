@@ -67,8 +67,6 @@ public class CreateSingleChatActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
 
-
-
         Intent mIntent = getIntent();
         currentUser = mIntent.getParcelableExtra("NewSingleChatUser");
 

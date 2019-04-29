@@ -83,16 +83,10 @@ public class TutorsActivity extends AppCompatActivity {
     }
 
     private void setTutoringSubjects() {
-//        mockTutorSubjects();
         for(Integer subjectCode : user.getTutorSubjectsKeys()){
             tutorSubjects.put(subjectCode, true);
             previousTutorSubjects.put(subjectCode, true);
         }
-    }
-
-    private void mockTutorSubjects() {
-        tutorSubjects.put(user.getApprovedSubjects().get(0).getCode(),true);
-        tutorSubjects.put(user.getApprovedSubjects().get(1).getCode(),true);
     }
 
     @Override
@@ -115,6 +109,7 @@ public class TutorsActivity extends AppCompatActivity {
             }
         }
     }
+
     private void removeTutoringSubject(int subjectCode) {
         tutorsRef.child(Integer.toString(subjectCode)).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -129,10 +124,8 @@ public class TutorsActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
-
     }
 
 //    private void removeTutoringSubject(int subjectCode) {
