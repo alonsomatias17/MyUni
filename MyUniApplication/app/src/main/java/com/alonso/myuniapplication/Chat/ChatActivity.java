@@ -2,18 +2,16 @@ package com.alonso.myuniapplication.Chat;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.alonso.myuniapplication.R;
@@ -23,7 +21,6 @@ import com.alonso.myuniapplication.business.Subject;
 import com.alonso.myuniapplication.business.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,13 +30,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -120,36 +114,6 @@ public class ChatActivity extends AppCompatActivity {
         return true;
     }
 
-    private void requestNewGroup() {
-        AlertDialog.Builder builder= new AlertDialog.Builder(ChatActivity.this, R.style.Alertdialog);
-        builder.setTitle("Enter Group Name:");
-
-        final EditText groupNameField = new EditText(ChatActivity.this);
-        groupNameField.setHint("Ej. Física I");
-        builder.setView(groupNameField);
-        builder.setPositiveButton("Crear", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String groupName = groupNameField.getText().toString();
-                if(TextUtils.isEmpty(groupName)){
-                    Toast.makeText(ChatActivity.this, "Por favor escriba el nombre del grupo",Toast.LENGTH_SHORT).show();
-
-                } else {
-                    createNewGroup(groupName);
-                }
-            }
-        });
-
-        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
-    }
-
     private void requestNewGroup2() {
         String[] subjectsArray = new String[currentUser.getOnGoingSubjects().size()];
         subjectsArray = getSubjectsAsStringArray(subjectsArray);
@@ -212,9 +176,6 @@ public class ChatActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
-                            //TODO: Agregar la key al currentUser
-//                            updateCurrentUserFS(currentUser);
-//                            updateUser(currentUser.getEmail(), groupName);
                             updateCurrentUserFS(currentUser);
                             updateUsers(groupName);
 
@@ -222,33 +183,6 @@ public class ChatActivity extends AppCompatActivity {
                         }
                     }
                 });
-    }
-
-    private void updateUser(String userEmail, final String groupName) {
-        /*firebaseFirestore.collection("usersKeys")
-                .document(userEmail)
-                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    User user = document.toObject(User.class);
-                    user.getGroupChatsKeys().add(groupName);
-                    Log.i("getUserFS", document.getId() + " => " + document.getData());
-                } else {
-                    Log.e("getUserFS", "Error getting documents.", task.getException());
-                }
-            }
-        });*/
-
-        Map<String, Object> data = new HashMap<>();
-        List<String> groupKeys = new ArrayList<>();
-        groupKeys.add(groupName);
-        data.put("groupChatsKeys", groupKeys);
-
-        firebaseFirestore.collection("users")
-                .document(userEmail)
-                .set(data, SetOptions.merge());
     }
 
     private void updateCurrentUserFS(final User user) {
