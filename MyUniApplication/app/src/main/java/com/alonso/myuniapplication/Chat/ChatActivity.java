@@ -18,18 +18,28 @@ import android.widget.Toast;
 
 import com.alonso.myuniapplication.R;
 import com.alonso.myuniapplication.adapters.TabsAccessorAdapter;
-import com.alonso.myuniapplication.business.SingleChat;
+import com.alonso.myuniapplication.business.GroupChat;
+import com.alonso.myuniapplication.business.Subject;
 import com.alonso.myuniapplication.business.User;
-import com.alonso.myuniapplication.business.UserDTO;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -44,10 +54,14 @@ public class ChatActivity extends AppCompatActivity {
 
     FirebaseFirestore db;
     DocumentReference userRef;
+    private DatabaseReference onGoingSubjectRef;
+
 
 
     private User currentUser = new User();
-    private User guestUser = new User("");
+
+    List<String> usersKeys = new ArrayList<>();
+    List<User> users = new ArrayList<>();
 
 
     @Override
@@ -58,6 +72,8 @@ public class ChatActivity extends AppCompatActivity {
         rootRef = FirebaseDatabase.getInstance().getReference();
         firebaseFirestore = FirebaseFirestore.getInstance();
         db = FirebaseFirestore.getInstance();
+        onGoingSubjectRef = FirebaseDatabase.getInstance().getReference().child("OnGoingSubjects");
+
 
         mToolbar = (Toolbar) findViewById(R.id.chat_page_toolbar);
         setSupportActionBar(mToolbar);
@@ -88,7 +104,7 @@ public class ChatActivity extends AppCompatActivity {
         switch(item.getItemId()) {
             case R.id.chat_create_group:
                 Toast.makeText(ChatActivity.this, "Crear chat grupal",Toast.LENGTH_SHORT).show();
-                requestNewGroup();
+                requestNewGroup2();
                 break;
             case R.id.chat_create_single_chat:
                 if(currentUser.getOnGoingSubjects().isEmpty()) {
@@ -98,7 +114,6 @@ public class ChatActivity extends AppCompatActivity {
                     Intent createSCIntent = new Intent(ChatActivity.this, CreateSingleChatActivity.class);
                     createSCIntent.putExtra("NewSingleChatUser", currentUser);
                     startActivity(createSCIntent);
-//                requestNewSingleChat();
                 }
                 break;
         }
@@ -135,118 +150,114 @@ public class ChatActivity extends AppCompatActivity {
         builder.show();
     }
 
-    private void requestNewSingleChat() {
-        AlertDialog.Builder builder= new AlertDialog.Builder(ChatActivity.this, R.style.Alertdialog);
+    private void requestNewGroup2() {
+        String[] subjectsArray = new String[currentUser.getOnGoingSubjects().size()];
+        subjectsArray = getSubjectsAsStringArray(subjectsArray);
 
-        //TODO: Cambiar, que elija al tutor
-        builder.setTitle("Enter Chat Name:");
-
-        final EditText chatNameField = new EditText(ChatActivity.this);
-        chatNameField.setHint("Ej. Tutor de Física");
-
-        builder.setView(chatNameField);
-        builder.setPositiveButton("Crear", new DialogInterface.OnClickListener() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Elije una materia para crear un grupo:");
+        builder.setItems(subjectsArray, new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String chatName = chatNameField.getText().toString();
-                if(TextUtils.isEmpty(chatName)){
-                    Toast.makeText(ChatActivity.this, "Por favor escriba el nombre del chat",Toast.LENGTH_SHORT).show();
-
-                } else {
-                    createNewSingleChatForUser("julian@myuni.com", chatName);
-                }
+            public void onClick(DialogInterface dialog, int pos) {
+                createGroup(currentUser.getOnGoingSubjects().get(pos));
             }
         });
-
-        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
         builder.show();
     }
 
-    private void createNewSingleChatForUser(String guestUserEmail, final String chatName) {
-        userRef = db.collection("users").document(guestUserEmail);
-        userRef.get()
-                .addOnCompleteListener(new OnCompleteListener < DocumentSnapshot > () {
+    private void createGroup(Subject subject) {
+        //TODO si ya existe el grupo agrego al nuevo usuario
+        getUserAndCreateGroup(subject);
+    }
+
+    private void getUserAndCreateGroup(final Subject subject) {
+        onGoingSubjectRef.child(Integer.toString(subject.getCode()))
+                .addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onComplete(@NonNull Task < DocumentSnapshot > task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot doc = task.getResult();
-                            guestUser = doc.toObject(User.class);
-                            Log.i("getUserFS", doc.getId() + " => " + doc.getData());
-                            createNewSingleChat(chatName);
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Iterator iterator = dataSnapshot.getChildren().iterator();
+                        while(iterator.hasNext()){
+                            String user = ((DataSnapshot)iterator.next()).getValue(String.class);
+                            usersKeys.add(user);
                         }
+                        createNewGroup(subject.toString());
                     }
-                })
-                .addOnFailureListener(new OnFailureListener() {
+
                     @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("getUserFS", "Error getting user");
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                     }
                 });
     }
 
+    @NonNull
+    private String[] getSubjectsAsStringArray(String[] subjectsArray) {
+        List<String> subjectsString = new ArrayList<>();
+
+        for (Subject subject: currentUser.getOnGoingSubjects()){
+            subjectsString.add(subject.toString());
+        }
+
+        subjectsArray = subjectsString.toArray(subjectsArray);
+        return subjectsArray;
+    }
+
     private void createNewGroup(final String groupName) {
-        rootRef.child("Groups").child(groupName).setValue("")
+        currentUser.getGroupChatsKeys().add(groupName);
+        GroupChat groupChat = new GroupChat();
+        groupChat.setParticipants(usersKeys);
+
+        rootRef.child("Groups").child(groupName).setValue(groupChat)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
                             //TODO: Agregar la key al currentUser
-                            updateUserFS(currentUser);
+//                            updateCurrentUserFS(currentUser);
+//                            updateUser(currentUser.getEmail(), groupName);
+                            updateCurrentUserFS(currentUser);
+                            updateUsers(groupName);
+
                             Toast.makeText(ChatActivity.this, "El grupo: " + groupName + " fue creado exitosamente",Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
 
-    private void createNewSingleChat(final String chatName) {
-        final String key = rootRef.child("SingleChats").push().getKey();
-        //TODO: Crear objeto single chat con valores reales
-        SingleChat singleChat = new SingleChat();
-        singleChat.getParticipants().add(userToUserDTO(currentUser));
-        singleChat.getParticipants().add(userToUserDTO(guestUser));
+    private void updateUser(String userEmail, final String groupName) {
+        /*firebaseFirestore.collection("usersKeys")
+                .document(userEmail)
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    User user = document.toObject(User.class);
+                    user.getGroupChatsKeys().add(groupName);
+                    Log.i("getUserFS", document.getId() + " => " + document.getData());
+                } else {
+                    Log.e("getUserFS", "Error getting documents.", task.getException());
+                }
+            }
+        });*/
 
-        rootRef.child("SingleChats").child(key).setValue(singleChat)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
-                            //TODO: Agregar la key al currentUser
-                            currentUser.getSingleChatsKeys().add(key);
-                            updateUserFS(currentUser);
+        Map<String, Object> data = new HashMap<>();
+        List<String> groupKeys = new ArrayList<>();
+        groupKeys.add(groupName);
+        data.put("groupChatsKeys", groupKeys);
 
-                            //TODO: Chequear si ya lo trajo o hacer una task
-                            guestUser.getSingleChatsKeys().add(key);
-                            updateUserFS(guestUser);
-                            Toast.makeText(ChatActivity.this, "El chat: " + chatName + " fue creado exitosamente",Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        firebaseFirestore.collection("users")
+                .document(userEmail)
+                .set(data, SetOptions.merge());
     }
 
-    private UserDTO userToUserDTO(User user) {
-        return new UserDTO(user.getUserName(), user.getEmail(), user.getProfileImageUri());
-    }
-
-    private void updateUserFS(final User user) {
+    private void updateCurrentUserFS(final User user) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 firebaseFirestore.collection("users")
                         .document(user.getEmail())
                         .set(user)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.i("ChatActivity", "User " + user.getEmail() + " updated correctly");
-
-                            }
-                        })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
@@ -255,5 +266,45 @@ public class ChatActivity extends AppCompatActivity {
                         });
             }
         }).start();
+    }
+
+    private void getUserFS(String email){
+        firebaseFirestore.collection("users")
+                .document(email)
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    users.add(document.toObject(User.class));
+                } else {
+                    Log.e("getUserFS", "Error getting documents.", task.getException());
+                }
+            }
+        });
+    }
+
+    private void updateUsers(String groupName){
+        for(String userEmail: usersKeys){
+            getAndUpdateUser(userEmail, groupName);
+        }
+    }
+
+    private void getAndUpdateUser(String userEmail, final String groupName) {
+        firebaseFirestore.collection("users")
+                .document(userEmail)
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    User user = document.toObject(User.class);
+                    user.getGroupChatsKeys().add(groupName);
+                    updateCurrentUserFS(user);
+                } else {
+                    Log.e("getUserFS", "Error getting documents.", task.getException());
+                }
+            }
+        });
     }
 }
