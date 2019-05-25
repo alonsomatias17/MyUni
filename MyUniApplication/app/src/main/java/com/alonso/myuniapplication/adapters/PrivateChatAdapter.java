@@ -66,6 +66,7 @@ public class PrivateChatAdapter extends RecyclerView.Adapter<PrivateChatAdapter.
     public void onBindViewHolder(final PrivateChatAdapter.MyViewHolder holder, int position) {
         final int pos = position;
         final UserDTO userDTO = getGustUserDTO(position);
+        final String singleChatKey = singleChats.get(position).getKey();
         holder.textView.setText(userDTO.getUserName());
         if(!userDTO.getProfileImage().equals(""))
             Picasso.get().load(userDTO.getProfileImage()).into(holder.profileImage);
@@ -75,7 +76,7 @@ public class PrivateChatAdapter extends RecyclerView.Adapter<PrivateChatAdapter.
             public void onClick(View v) {
                 Intent chatIntent = new Intent(context, SingleChatActivity.class);
                 //TODO: pasar ID de chat
-                chatIntent.putExtra("chat_id", userDTO.getEmail());
+                chatIntent.putExtra("chat_id", singleChatKey);
                 chatIntent.putExtra("visit_user_id", userDTO.getUserName());
                 chatIntent.putExtra("visit_user_profile_image", userDTO.getProfileImage());
                 context.startActivity(chatIntent);

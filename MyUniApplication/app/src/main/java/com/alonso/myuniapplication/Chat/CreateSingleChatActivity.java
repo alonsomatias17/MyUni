@@ -167,7 +167,7 @@ public class CreateSingleChatActivity extends AppCompatActivity {
     private void createNewSingleChat(final String chatName) {
         final String key = rootRef.child("SingleChats").push().getKey();
         //TODO: Crear objeto single chat con valores reales
-        SingleChat singleChat = new SingleChat();
+        SingleChat singleChat = new SingleChat(key);
         singleChat.getParticipants().add(userToUserDTO(currentUser));
         singleChat.getParticipants().add(userToUserDTO(guestUser));
 

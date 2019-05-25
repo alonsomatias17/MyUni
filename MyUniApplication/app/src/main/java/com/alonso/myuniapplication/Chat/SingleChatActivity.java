@@ -67,7 +67,7 @@ public class SingleChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_single_chat);
 
         singleChatKey = getIntent().getExtras().get("chat_id").toString();
-        singleChatKey = "-LbU4U_YmIuUn2x8Dzjf";
+//        singleChatKey = "-LbU4U_YmIuUn2x8Dzjf";
         messageReceiverName = getIntent().getExtras().get("visit_user_id").toString();
         getMessageReceiverImage = getIntent().getExtras().get("visit_user_profile_image").toString();
 
@@ -194,13 +194,6 @@ public class SingleChatActivity extends AppCompatActivity {
                     Log.e("SingleChatActivity", "Error saving message", e);
                 }
             });
-            /*rootRef.child("SingleChats").child("-LbU4U_YmIuUn2x8Dzjf").setValue(currentSingleChat)
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.e("SingleChatActivity", "Error saving message", e);
-                        }
-                    });*/
         }
     }
 

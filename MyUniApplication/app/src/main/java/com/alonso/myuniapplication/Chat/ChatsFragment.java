@@ -188,7 +188,7 @@ public class ChatsFragment extends Fragment {
 
     private List<SingleChat> singleChatsMock(){
         List<SingleChat> singleChats = new ArrayList<>();
-        SingleChat singleChat = new SingleChat();
+        SingleChat singleChat = new SingleChat("1");
         singleChat.getParticipants().addAll(chatsMock());
         singleChats.add(singleChat);
         return singleChats;

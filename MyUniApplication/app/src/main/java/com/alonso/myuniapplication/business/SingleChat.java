@@ -5,12 +5,28 @@ import java.util.List;
 
 public class SingleChat {
 
+    private String key;
     private List<UserDTO> participants;
     private List<ChatMessage> messages;
 
     public SingleChat() {
+        key = "";
         participants = new ArrayList<>();
         messages = new ArrayList<>();
+    }
+
+    public SingleChat(String key) {
+        this.key = key;
+        participants = new ArrayList<>();
+        messages = new ArrayList<>();
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public List<UserDTO> getParticipants() {
