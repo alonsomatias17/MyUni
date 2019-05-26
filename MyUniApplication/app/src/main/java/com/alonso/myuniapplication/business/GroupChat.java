@@ -28,4 +28,8 @@ public class GroupChat {
     public void setMessages(List<ChatMessage> messages) {
         this.messages = messages;
     }
+
+    public void addMessage(ChatMessage chatMessage) {
+        messages.add(chatMessage);
+    }
 }

@@ -67,7 +67,6 @@ public class SingleChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_single_chat);
 
         singleChatKey = getIntent().getExtras().get("chat_id").toString();
-//        singleChatKey = "-LbU4U_YmIuUn2x8Dzjf";
         messageReceiverName = getIntent().getExtras().get("visit_user_id").toString();
         getMessageReceiverImage = getIntent().getExtras().get("visit_user_profile_image").toString();
 
@@ -92,26 +91,6 @@ public class SingleChatActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-
-        /*ValueEventListener singleChatListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.i("SingleChatActivity", "Get current single chat done");
-                currentSingleChat = dataSnapshot.getValue(SingleChat.class);
-                chatMessages=currentSingleChat.getMessages();
-                messageAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("SingleChatActivity", "Error getting Data: " + databaseError.getMessage());
-            }
-        };
-        singleChatReef.addValueEventListener(singleChatListener);
-        // [END post_value_event_listener]
-
-        // Keep copy of post listener so we can remove it when app stops
-        mSingleChatListener = singleChatListener;*/
 
         rootRef.child("SingleChats").child(singleChatKey)
                 .addValueEventListener(new ValueEventListener() {

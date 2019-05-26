@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/darker_gray"
+    android:background="@drawable/school_background"
     tools:context=".Chat.SingleChatActivity">
 
     <include
@@ -33,8 +33,9 @@
             android:id="@+id/input_single_chat_message"
             android:layout_width="320dp"
             android:layout_height="wrap_content"
-            android:hint="Escribe aquií..."
+            android:hint="Escribe aquí..."
             android:padding="15dp"
+            android:layout_marginRight="8dp"
             />
         <ImageButton
             android:id="@+id/single_chat_send_message_button"

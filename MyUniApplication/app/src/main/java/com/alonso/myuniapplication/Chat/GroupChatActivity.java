@@ -1,190 +1,169 @@
 package com.alonso.myuniapplication.Chat;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alonso.myuniapplication.R;
-import com.alonso.myuniapplication.business.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.alonso.myuniapplication.adapters.MessageAdapter;
+import com.alonso.myuniapplication.business.ChatMessage;
+import com.alonso.myuniapplication.business.GroupChat;
+import com.alonso.myuniapplication.business.SingleChat;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class GroupChatActivity extends AppCompatActivity {
 
-    private Toolbar mToolbar;
-    private ImageButton sendMessageButton;
-    private EditText userMessageInput;
-    private ScrollView mScroolView;
-    private TextView displayTextMessages;
-
-//    private FirebaseAuth mAuth;
-    private  String currentGroupName, currentUserId, currentUserName, currentDate, currentTime;
-
-    private FirebaseAuth mAuth;
     private FirebaseUser firebaseUser;
-    private FirebaseFirestore firebaseFirestore;
-    private DatabaseReference groupNameRef, groupMessageKeyRef;
+    private DatabaseReference rootRef, groupsChatReef;
 
-    private User user;
+    private String groupChatKey;
+
+    private TextView groupNameTV;
+
+    private Toolbar chatToolBar;
+
+    private ImageButton sendMessageButton;
+    private EditText messageInputText;
+
+    private GroupChat currentGroupChat;
+
+    private List<ChatMessage> chatMessages = new ArrayList<>();
+    private LinearLayoutManager linearLayoutManager;
+    private MessageAdapter messageAdapter;
+    private RecyclerView userMessagesRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_chat);
 
-        currentGroupName = getIntent().getExtras().get("groupName").toString();
-        Toast.makeText(this,"Nombre del Grupo: " + currentGroupName, Toast.LENGTH_SHORT).show();
+        groupChatKey = getIntent().getExtras().get("chat_id").toString();
 
-        mAuth = FirebaseAuth.getInstance();
-        firebaseUser = mAuth.getCurrentUser();
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        groupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupName);
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        rootRef = FirebaseDatabase.getInstance().getReference();
+        groupsChatReef = FirebaseDatabase.getInstance().getReference().child("Groups").child(groupChatKey);
 
-        findUserByEmailFS();
         initializeFields();
+
+        groupNameTV.setText(groupChatKey);
         sendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveMessageToDatabase();
-                userMessageInput.setText("");
-                mScroolView.fullScroll(ScrollView.FOCUS_DOWN);
+                sendMessage();
             }
         });
+
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
-        groupNameRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                if(dataSnapshot.exists()){
-                    displayMessages(dataSnapshot);
-                }
-            }
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                if(dataSnapshot.exists()){
-                    displayMessages(dataSnapshot);
-                }
-            }
+        rootRef.child("Groups").child(groupChatKey)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Log.i("SingleChatActivity", "Get current single chat done");
+                        currentGroupChat = dataSnapshot.getValue(GroupChat.class);
+                        bindMessages(chatMessages, currentGroupChat.getMessages());
+                        messageAdapter.notifyDataSetChanged();
+                        userMessagesRecyclerView.smoothScrollToPosition(userMessagesRecyclerView.getAdapter().getItemCount());
+                    }
 
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void displayMessages(DataSnapshot dataSnapshot) {
-        Iterator iterator = dataSnapshot.getChildren().iterator();
-
-        while (iterator.hasNext()){
-            String chatDate = (String) ((DataSnapshot)iterator.next()).getValue();
-            String chatMessage = (String) ((DataSnapshot)iterator.next()).getValue();
-            String chatName = (String) ((DataSnapshot)iterator.next()).getValue();
-            String chatTime = (String) ((DataSnapshot)iterator.next()).getValue();
-            displayTextMessages.append(chatName + ": \n" + chatMessage + "\n" + chatDate + " " + chatTime + ": \n\n");
-            mScroolView.fullScroll(ScrollView.FOCUS_DOWN);
-        }
-
-    }
-
-    private void saveMessageToDatabase() {
-        String message = userMessageInput.getText().toString();
-        String messageKey = groupNameRef.push().getKey();
-
-        if(TextUtils.isEmpty(message)){
-            Toast.makeText(this,"Por favor escribe un mensaje...", Toast.LENGTH_SHORT).show();
-        } else {
-            Calendar calForDate = Calendar.getInstance();
-            SimpleDateFormat currentDateFormat = new SimpleDateFormat("MMM dd, yyyy");
-            currentDate = currentDateFormat.format(calForDate.getTime());
-
-            SimpleDateFormat currentTimeFormat = new SimpleDateFormat("hh:mm:ss");
-            currentTime = currentTimeFormat.format(calForDate.getTime());
-
-            HashMap<String, Object> groupMessageKey = new HashMap<>();
-            groupNameRef.updateChildren(groupMessageKey);
-            groupMessageKeyRef = groupNameRef.child(messageKey);
-
-            //TODO: crear una clase mensaje
-            HashMap<String, Object> messageInfoMap = new HashMap<>();
-            messageInfoMap.put("name", user.getUserName());
-            messageInfoMap.put("message", message);
-            messageInfoMap.put("date", currentDate);
-            messageInfoMap.put("time", currentTime);
-            groupMessageKeyRef.updateChildren(messageInfoMap);
-
-        }
+                    }
+                });
+        Log.i("SingleChatActivity", "Amount of chats: " + messageAdapter.getItemCount());
     }
 
     private void initializeFields() {
-        mToolbar = (Toolbar) findViewById(R.id.group_chat_bar_layout);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(currentGroupName );
+        chatToolBar = (Toolbar) findViewById(R.id.group_chat_bar_layout);
+        this.setSupportActionBar(chatToolBar);
+        getSupportActionBar().setTitle("");
 
-        sendMessageButton = (ImageButton) findViewById(R.id.send_message_button);
-        userMessageInput = (EditText) findViewById(R.id.input_group_message);
-        displayTextMessages = (TextView) findViewById(R.id.group_chat_text_display);
-        mScroolView = (ScrollView) findViewById(R.id.chat_scroll_view);
+        ActionBar actionBar = this.getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowCustomEnabled(true);
+
+        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View actionBarView = layoutInflater.inflate(R.layout.custome_group_chat_bar, null);
+        actionBar.setCustomView(actionBarView);
+
+        //Va debajo de el seteo de actionBarView
+        groupNameTV = (TextView) findViewById(R.id.group_chat_name);
+        sendMessageButton = (ImageButton) findViewById(R.id.group_chat_send_message_button);
+        messageInputText = (EditText) findViewById(R.id.input_group_chat_message);
+
+        messageAdapter = new MessageAdapter(chatMessages);
+
+        userMessagesRecyclerView = (RecyclerView) findViewById(R.id.group_messages_list_of_users);
+        linearLayoutManager = new LinearLayoutManager(this);
+        userMessagesRecyclerView.setLayoutManager(linearLayoutManager);
+        userMessagesRecyclerView.setAdapter(messageAdapter);
     }
 
-    private void findUserByEmailFS(){
-        firebaseFirestore.collection("users")
-                .whereEqualTo("email", firebaseUser.getEmail())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                user = document.toObject(User.class);
-                                Log.i("findUserByEmailFS", document.getId() + " => " + document.getData());
-                            }
-                        } else {
-                            Log.e("findUserByEmailFS", "Error getting documents.", task.getException());
-                        }
-                    }
-                });
+    private void sendMessage(){
+        String messageTest = messageInputText.getText().toString();
+        if(TextUtils.isEmpty(messageTest)){
+            Toast.makeText(GroupChatActivity.this, "Por favor, primero escribe un mensaje...", Toast.LENGTH_SHORT).show();
+        } else {
+            ChatMessage chatMessage = createChatMessage(messageInputText.getText().toString());
+            currentGroupChat.addMessage(chatMessage);
+
+            messageInputText.setText("");
+            groupsChatReef.setValue(currentGroupChat).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e("GroupChatActivity", "Error saving message", e);
+                }
+            });
+        }
     }
 
+    private ChatMessage createChatMessage(String message) {
+        Calendar calForDate = Calendar.getInstance();
+        SimpleDateFormat currentDateFormat = new SimpleDateFormat("MMM dd, yyyy");
+        String currentDate = currentDateFormat.format(calForDate.getTime());
 
+        SimpleDateFormat currentTimeFormat = new SimpleDateFormat("hh:mm:ss");
+        String currentTime = currentTimeFormat.format(calForDate.getTime());
+
+        return new ChatMessage(firebaseUser.getEmail(), currentDate, message, firebaseUser.getDisplayName(), currentTime);
+    }
+
+    private void bindMessages(List<ChatMessage> messagesToLoad, List<ChatMessage> messagesForLoad) {
+        messagesToLoad.clear();
+        for(ChatMessage chatMessage: messagesForLoad){
+            messagesToLoad.add(chatMessage);
+        }
+    }
 }
