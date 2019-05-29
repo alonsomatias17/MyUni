@@ -10,8 +10,8 @@
 
     <style name="ChatToolbarTheme" parent="AppTheme.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimaryCT</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDarkCT</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccentCT</item>
     </style>
 
