@@ -50,6 +50,8 @@ public class MenuActivity extends AppCompatActivity {
         menuActionBarDrawerToggle.syncState();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("MyUni");
+
 
         navigationView = (NavigationView)findViewById(R.id.nav_view);
         setNavigationListener();
