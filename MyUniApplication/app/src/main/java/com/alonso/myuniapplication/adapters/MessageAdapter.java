@@ -114,9 +114,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         User user = documentSnapshot.toObject(User.class);
-                        Picasso.get()
-                                .load(user.getProfileImageUri())
-                                .placeholder(R.drawable.profile_image).into(holder1.receiverProfileImage);
+                        if(!user.getProfileImageUri().equals("")) {
+                            Picasso.get().load(user.getProfileImageUri())
+                                    .placeholder(R.drawable.profile_image).into(holder1.receiverProfileImage);
+                        }
                         usersProfilesPic.put(userSenderEmail, user.getProfileImageUri());
                     }
                 });
